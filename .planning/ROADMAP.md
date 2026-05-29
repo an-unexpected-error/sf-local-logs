@@ -60,7 +60,10 @@ Plans:
   4. User can output results as JSON via `--json` flag for programmatic use
   5. Status messages explain what's happening ("Searching...", "Found 5 users", etc.) and error messages guide remediation
 
-**Plans:** TBD
+**Plans:** 1 plan (Phase 1 planning complete)
+
+Plans:
+- [ ] 01-01-PLAN.md — Implement search command, utilities, tests, and messages (Wave 1: 6 parallel tasks)
 
 **UI hint**: yes
 
@@ -132,11 +135,11 @@ Plans:
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 0. Plugin Setup | 0/5 | Planned | - |
-| 1. User Search | 0/5 | Not started | - |
-| 2. Debug Sessions | 0/5 | Not started | - |
-| 3. Log Management | 0/6 | Not started | - |
-| 4. Log Filtering | 0/5 | Not started | - |
+| 0. Plugin Setup | 5/5 | Complete | 2026-05-29 |
+| 1. User Search | 1/1 | Planned | — |
+| 2. Debug Sessions | 0/N | Not started | — |
+| 3. Log Management | 0/N | Not started | — |
+| 4. Log Filtering | 0/N | Not started | — |
 
 ---
 
@@ -159,4 +162,4 @@ Plans:
 
 ## Next Steps
 
-1. Execute Phase 0: `/gsd-execute-phase 0`
+1. Execute Phase 1: `/gsd-execute-phase 1`
