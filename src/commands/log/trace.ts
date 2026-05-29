@@ -1,7 +1,7 @@
 import { fileURLToPath } from 'node:url';
 import { dirname } from 'node:path';
 import { SfCommand, Flags } from '@salesforce/sf-plugins-core';
-import { Messages, Org } from '@salesforce/core';
+import { Messages } from '@salesforce/core';
 import { cli } from 'cli-ux';
 import { getDefaultDebugLevel, createTraceFlag, checkExistingTraceFlag, getDebugLevelName } from '../../utils/trace-helper.js';
 import { TraceResult } from '../../types/trace.js';
@@ -151,15 +151,24 @@ export default class Trace extends SfCommand<TraceResult> {
 
       // Display result in table format (unless --json flag is used, which SfCommand handles)
       if (!this.jsonEnabled()) {
-        cli.table([
+        cli.table(
+          [
+            {
+              'Trace Flag ID': result.traceFlag.id,
+              'User': result.traceFlag.userName,
+              'Email': result.traceFlag.userEmail,
+              'Debug Level': result.traceFlag.debugLevel,
+              'Expires At': result.traceFlag.expirationDate,
+            },
+          ],
           {
-            'Trace Flag ID': result.traceFlag.id,
-            'User': result.traceFlag.userName,
-            'Email': result.traceFlag.userEmail,
-            'Debug Level': result.traceFlag.debugLevel,
-            'Expires At': result.traceFlag.expirationDate,
-          },
-        ]);
+            'Trace Flag ID': { get: (row: Record<string, string>) => row['Trace Flag ID'] },
+            'User': { get: (row: Record<string, string>) => row['User'] },
+            'Email': { get: (row: Record<string, string>) => row['Email'] },
+            'Debug Level': { get: (row: Record<string, string>) => row['Debug Level'] },
+            'Expires At': { get: (row: Record<string, string>) => row['Expires At'] },
+          }
+        );
 
         // Display watch mode message (Phase 3 will implement actual monitoring)
         if (!noWatch) {
