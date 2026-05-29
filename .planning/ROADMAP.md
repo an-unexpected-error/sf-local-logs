@@ -34,7 +34,14 @@
   3. Plugin verifies Node.js 18.0.0+ at install time and refuses installation on incompatible versions
   4. Plugin works with Salesforce CLI v2.x+ and reports clear errors if CLI version is incompatible
 
-**Plans:** TBD
+**Plans:** 5 plans
+
+Plans:
+- [ ] 00-01-PLAN.md — Scaffold plugin (package.json, tsconfig, eslint, mocha, compile, sf plugin link)
+- [ ] 00-02-PLAN.md — Create 5 command stubs + messages files (sf log namespace)
+- [ ] 00-03-PLAN.md — Create unit test scaffolds and NUT scaffolds for all 5 commands
+- [ ] 00-04-PLAN.md — GitHub Actions CI/CD workflows + dev setup script
+- [ ] 00-05-PLAN.md — Verify installation (full integration check + human checkpoint)
 
 ---
 
@@ -125,7 +132,7 @@
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 0. Plugin Setup | 0/4 | Not started | - |
+| 0. Plugin Setup | 0/5 | Planned | - |
 | 1. User Search | 0/5 | Not started | - |
 | 2. Debug Sessions | 0/5 | Not started | - |
 | 3. Log Management | 0/6 | Not started | - |
@@ -152,5 +159,4 @@
 
 ## Next Steps
 
-1. User review and approval of roadmap structure
-2. `/gsd-plan-phase 0` to begin Phase 0: Plugin Setup
+1. Execute Phase 0: `/gsd-execute-phase 0`
