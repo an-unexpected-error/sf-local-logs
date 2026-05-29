@@ -5,6 +5,7 @@
   "author": "Michael Cole",
   "license": "MIT",
   "main": "lib/index.js",
+  "type": "module",
   "types": "lib/index.d.ts",
   "engines": {
     "node": ">=18.0.0"
@@ -38,7 +39,7 @@
     "postpack": "shx rm -f oclif.manifest.json",
     "prepack": "sf-prepack",
     "prepare": "npm run compile",
-    "test": "sf-test",
+    "test": "nyc mocha",
     "test:nuts": "nyc mocha \"**/*.nut.ts\" --timeout 500000 --parallel",
     "version": "oclif readme",
     "setup-devorg": "bash scripts/setup-devorg.sh",

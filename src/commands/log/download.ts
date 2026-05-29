@@ -1,5 +1,10 @@
+import { fileURLToPath } from 'node:url';
+import { dirname } from 'node:path';
 import { SfCommand, Flags } from '@salesforce/sf-plugins-core';
 import { Messages } from '@salesforce/core';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 Messages.importMessagesDirectory(__dirname);
 const messages = Messages.loadMessages('sf-local-logs', 'log.download');
