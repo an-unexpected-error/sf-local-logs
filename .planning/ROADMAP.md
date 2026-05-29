@@ -10,7 +10,7 @@
 
 ## Phases
 
-- [ ] **Phase 0: Plugin Setup** - Project scaffolding, framework, and installation capability
+- [x] **Phase 0: Plugin Setup** - Project scaffolding, framework, and installation capability (✓ 2026-05-29)
 - [ ] **Phase 1: User Search** - Find Salesforce users by name with paginated results
 - [ ] **Phase 2: Debug Sessions** - Initiate debug log tracing for selected users
 - [ ] **Phase 3: Log Management** - Download logs and manage storage within 1GB limit
@@ -34,14 +34,14 @@
   3. Plugin verifies Node.js 18.0.0+ at install time and refuses installation on incompatible versions
   4. Plugin works with Salesforce CLI v2.x+ and reports clear errors if CLI version is incompatible
 
-**Plans:** 5 plans
+**Plans:** 5 plans (✓ 5/5 complete)
 
 Plans:
-- [ ] 00-01-PLAN.md — Scaffold plugin (package.json, tsconfig, eslint, mocha, compile, sf plugin link)
-- [ ] 00-02-PLAN.md — Create 5 command stubs + messages files (sf log namespace)
-- [ ] 00-03-PLAN.md — Create unit test scaffolds and NUT scaffolds for all 5 commands
-- [ ] 00-04-PLAN.md — GitHub Actions CI/CD workflows + dev setup script
-- [ ] 00-05-PLAN.md — Verify installation (full integration check + human checkpoint)
+- [x] 00-01-PLAN.md — Scaffold plugin (package.json, tsconfig, eslint, mocha, compile, sf plugin link) ✓
+- [x] 00-02-PLAN.md — Create 5 command stubs + messages files (sf log namespace) ✓
+- [x] 00-03-PLAN.md — Create unit test scaffolds and NUT scaffolds for all 5 commands ✓
+- [x] 00-04-PLAN.md — GitHub Actions CI/CD workflows + dev setup script ✓
+- [x] 00-05-PLAN.md — Verify installation (full integration check + human checkpoint) ✓
 
 ---
 
