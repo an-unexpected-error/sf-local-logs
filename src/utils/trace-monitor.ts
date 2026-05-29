@@ -27,8 +27,8 @@ import { Org } from '@salesforce/core';
  * @returns Promise<void> - Resolves when monitoring completes (either by expiry or interrupt)
  */
 export async function watchTraceFlag(
-  org: Org,
-  traceId: string,
+  _org: Org,
+  _traceId: string,
   expirationDate: string,
   logger: { log: (msg: string) => void }
 ): Promise<void> {
