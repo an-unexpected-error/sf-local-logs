@@ -43,7 +43,7 @@
     "test:nuts": "nyc mocha \"**/*.nut.ts\" --timeout 500000 --parallel",
     "version": "oclif readme",
     "setup-devorg": "bash scripts/setup-devorg.sh",
-    "link-local": "sf plugins link . --no-verify",
+    "link-local": "sf plugins link .",
     "test-commands": "sf log search --help && sf log trace --help && sf log download --help && sf log purge --help && sf log filter --help"
   },
   "dependencies": {
