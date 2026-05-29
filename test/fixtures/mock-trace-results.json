@@ -1,0 +1,27 @@
+{
+  "traceFlag": {
+    "id": "7eFB0000000IZ3GCAQ",
+    "success": true,
+    "errors": []
+  },
+  "debugLevel": {
+    "Id": "7DF46000000QFN2GCAH",
+    "DeveloperName": "Debug",
+    "APIVersion": 60.0
+  },
+  "user": {
+    "Id": "005B0000001IZ9KGAW",
+    "FirstName": "John",
+    "LastName": "Doe",
+    "Email": "john.doe@example.com"
+  },
+  "traceFlagDetails": {
+    "Id": "7eFB0000000IZ3GCAQ",
+    "TracedEntityId": "005B0000001IZ9KGAW",
+    "DebugLevelId": "7DF46000000QFN2GCAH",
+    "StartTime": "2026-05-30T14:30:00.000Z",
+    "ExpirationDate": "2026-05-31T14:30:00.000Z",
+    "LogType": "DEVELOPER_LOG",
+    "RequestStatus": "PENDING"
+  }
+}
