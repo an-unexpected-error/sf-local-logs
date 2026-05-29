@@ -1,0 +1,39 @@
+{
+  "records": [
+    {
+      "Id": "005xx000000Svz",
+      "FirstName": "John",
+      "LastName": "Doe",
+      "Email": "john.doe@example.com",
+      "LastLoginDate": "2026-05-29T10:00:00.000Z"
+    },
+    {
+      "Id": "005xx000000Swa",
+      "FirstName": "Jane",
+      "LastName": "Smith",
+      "Email": "jane.smith@example.com",
+      "LastLoginDate": "2026-05-28T14:30:00.000Z"
+    },
+    {
+      "Id": "005xx000000Swb",
+      "FirstName": "Jonathan",
+      "LastName": "Brown",
+      "Email": "jonathan.brown@example.com",
+      "LastLoginDate": null
+    },
+    {
+      "Id": "005xx000000Swc",
+      "FirstName": "Alice",
+      "LastName": "Johnson",
+      "Email": "alice.johnson@example.com",
+      "LastLoginDate": "2026-05-27T08:15:00.000Z"
+    },
+    {
+      "Id": "005xx000000Swd",
+      "FirstName": "Bob",
+      "LastName": "Williams",
+      "Email": "bob.williams@example.com",
+      "LastLoginDate": "2026-05-26T16:45:00.000Z"
+    }
+  ]
+}
