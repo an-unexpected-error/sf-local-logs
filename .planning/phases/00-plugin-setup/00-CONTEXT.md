@@ -24,30 +24,35 @@ See `/planning/REQUIREMENTS.md` for full requirement text.
 
 ## Implementation Decisions
 
-### Command Structure
+### Command Structure (Single Unified Entry Point)
 
-**Decision:** Base command namespace is `sf log`
+**Decision:** Single command `sf log trace` that guides users through all 5 debug log actions in one flow
 
-**Why:** Aligns with Salesforce CLI naming conventions (e.g., `sf deploy`, `sf retrieve`). Clear and concise for end users.
+**Why:** Simpler user experience — one command to learn instead of 5. Interactive guidance makes the workflow obvious for new users. Flag-based shortcuts support scripting and automation. All actions are part of one logical flow (find user → enable tracing → download → analyze → cleanup).
 
-**Scope:** Applies to all subcommands:
-- `sf log search` (Phase 1: User Search)
-- `sf log trace` (Phase 2: Debug Sessions)
-- `sf log download` (Phase 3: Log Management)
-- `sf log purge` (Phase 3: Log Management)
-- `sf log filter` (Phase 4: Log Filtering)
+**Scope:** All 5 actions integrated into one command:
+1. **Search** — Find user by name (interactive prompt or `--user` flag)
+2. **Trace** — Enable debug session for that user (automatic or `--trace` flag)
+3. **Download** — Fetch created logs (automatic or `--download` flag)
+4. **Filter** — Search log content by keyword (optional, `--filter` flag)
+5. **Purge** — Delete old logs if approaching storage limit (optional, `--purge` flag)
 
-### Initial Scaffolding
+**Interaction Model:**
+- **Interactive mode (default):** `sf log trace` → prompts through steps with guidance
+- **Flag-based mode:** `sf log trace --user "John" --download --filter "error"` → skips prompts, runs directly
 
-**Decision:** Scaffold all 5 command stubs (search, trace, download, purge, filter) as empty placeholders in Phase 0
+### Single Command Implementation in Phase 0
 
-**Why:** Provides the complete command structure upfront. Clarifies the full scope for planning and testing. Makes dependency flows explicit for each phase. Each phase then implements its command without restructuring.
+**Decision:** Phase 0 scaffolds only one command file: `src/commands/log/trace.ts`
 
-**Implementation:** Each command file will have:
+**Why:** Simplified scaffolding. Eliminates the need to refactor 5 commands later. The trace command is the logical entry point for the entire workflow.
+
+**Implementation:** Create a single command file with:
 - Proper oclif command class inheriting `SfCommand`
-- Flags from REQUIREMENTS.md and ROADMAP.md (flags spec'd out per phase)
-- Docstring explaining what will be implemented
-- Placeholder implementation that logs "Coming in Phase X"
+- All flags for all 5 actions: `--user`, `--user-id`, `--download`, `--filter`, `--purge`, `--target-org`
+- Docstring explaining the interactive workflow
+- Placeholder implementation that shows the full workflow structure
+- Help text describing the workflow: "Search for a user by name, enable debug tracing, download logs, filter content, and manage storage."
 
 ### Local Development Environment
 
@@ -108,7 +113,8 @@ Downstream agents (researcher, planner) must consult these docs:
 
 1. **Project structure** (from plugin-template-sf template):
    - `src/commands/log/` — Command directory
-   - `src/commands/log/search.ts`, `trace.ts`, `download.ts`, `purge.ts`, `filter.ts` — Placeholder command files
+   - `src/commands/log/trace.ts` — Single unified trace command with all flags for search/trace/download/filter/purge
+   - `messages/log.trace.md` — Help text for the trace command
    - `test/` — Test suite structure
    - `package.json` — Plugin metadata and dependencies
    - `tsconfig.json` — TypeScript configuration
@@ -127,6 +133,17 @@ No reusable code patterns yet (first phase).
 
 ---
 
+## Future Phase Implications
+
+With a single unified `sf log trace` command:
+
+- **Phase 1 (User Search):** Implements the search step of the trace command (interactive prompts + `--user` flag)
+- **Phase 2 (Debug Sessions):** Implements the trace step (automatic tracing of selected user)
+- **Phase 3 (Log Management):** Implements download and purge steps (log retrieval and storage cleanup)
+- **Phase 4 (Log Filtering):** Implements the filter step (keyword search within downloaded logs)
+
+Each phase deepens the trace command's implementation without changing the command structure. The workflow remains: `sf log trace` (interactive) or `sf log trace [flags]` (scripted).
+
 ## Deferred Ideas
 
 None identified during discussion. All scope clarifications stayed within Phase 0 boundaries.
@@ -135,11 +152,17 @@ None identified during discussion. All scope clarifications stayed within Phase 
 
 ## Notes for Downstream Agents
 
-1. **Planner:** Phase 0 plan should include scaffolding the plugin, configuring build/test infrastructure, and verifying the framework loads. All decisions above are locked — do not re-ask.
+1. **Planner:** Phase 0 now scaffolds a SINGLE command (`sf log trace`) with all flags for all 5 actions (search, trace, download, filter, purge). Create ONE command file, not 5. Build test scaffolds for this single command. Configure CI/CD as before. Do not re-ask about the single-command design — it is locked.
 
-2. **Researcher:** Verify that plugin-template-sf supports Node 18+ verification at install time. If not, plan must handle version checking manually.
+2. **Researcher:** Verify that:
+   - oclif v4 supports interactive prompts with flag overrides (e.g., flag presence skips a prompt)
+   - @salesforce/sf-plugins-core v12 supports conditional flags
+   - plugin-template-sf supports Node 18+ verification at install time. If not, plan must handle version checking manually.
 
-3. **Execution:** After Phase 0 completes, the plugin should be runnable and installable locally. Test with `sf plugin link .` to verify command registration.
+3. **Execution:** After Phase 0 completes:
+   - `sf log trace --help` should show all flags (--user, --user-id, --download, --filter, --purge, --target-org)
+   - `sf log trace` should run and show the interactive workflow structure
+   - Test with `sf plugin link .` to verify command registration
 
 ---
 
