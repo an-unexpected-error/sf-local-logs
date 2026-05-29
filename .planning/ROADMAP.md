@@ -11,7 +11,7 @@
 ## Phases
 
 - [x] **Phase 0: Plugin Setup** - Project scaffolding, framework, and installation capability (✓ 2026-05-29)
-- [ ] **Phase 1: User Search** - Find Salesforce users by name with paginated results
+- [x] **Phase 1: User Search** - Find Salesforce users by name with paginated results (✓ 2026-05-29)
 - [ ] **Phase 2: Debug Sessions** - Initiate debug log tracing for selected users
 - [ ] **Phase 3: Log Management** - Download logs and manage storage within 1GB limit
 - [ ] **Phase 4: Log Filtering** - Filter, analyze, and export debug log data
@@ -54,16 +54,18 @@ Plans:
 **Requirements:** USER-01, USER-02, USER-03, UX-01, UX-02, UX-04, UX-05
 
 **Success Criteria** (what must be TRUE):
-  1. User can run `sf log search --name "John"` and receive a list of matching users
-  2. Results are paginated when search returns many users (e.g., 10+ results), with clear "next" and "previous" navigation
-  3. Each search result displays user ID, name, email, and last login timestamp
-  4. User can output results as JSON via `--json` flag for programmatic use
-  5. Status messages explain what's happening ("Searching...", "Found 5 users", etc.) and error messages guide remediation
+  1. User can run `sf log search --name "John"` and receive a list of matching users ✓
+  2. Results are paginated when search returns many users (e.g., 10+ results), with clear "next" and "previous" navigation ✓
+  3. Each search result displays user ID, name, email, and last login timestamp ✓
+  4. User can output results as JSON via `--json` flag for programmatic use ✓
+  5. Status messages explain what's happening ("Searching...", "Found 5 users", etc.) and error messages guide remediation ✓
 
-**Plans:** 1 plan (Phase 1 planning complete)
+**Plans:** 1 plan (✓ 1/1 complete)
 
 Plans:
-- [ ] 01-01-PLAN.md — Implement search command, utilities, tests, and messages (Wave 1: 6 parallel tasks)
+- [x] 01-01-PLAN.md — Implement search command, utilities, tests, and messages (Wave 1: 6 parallel tasks) ✓
+
+**Completed:** 2026-05-29
 
 **UI hint**: yes
 
@@ -136,7 +138,7 @@ Plans:
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 0. Plugin Setup | 5/5 | Complete | 2026-05-29 |
-| 1. User Search | 1/1 | Planned | — |
+| 1. User Search | 1/1 | Complete | 2026-05-29 |
 | 2. Debug Sessions | 0/N | Not started | — |
 | 3. Log Management | 0/N | Not started | — |
 | 4. Log Filtering | 0/N | Not started | — |
