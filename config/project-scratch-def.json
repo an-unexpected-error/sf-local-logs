@@ -1,0 +1,8 @@
+{
+  "orgName": "sf-local-logs Dev Org",
+  "edition": "Developer",
+  "features": ["EnableSetPasswordInApi"],
+  "settings": {
+    "lightningExperienceSettings": { "enableS1DesktopEnabled": true }
+  }
+}
