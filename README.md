@@ -1,40 +1,83 @@
 # sf-local-logs
 
-A Salesforce CLI plugin for efficient management of debug logs for high-volume Salesforce users. Provides local caching, filtering, and analysis of debug logs to improve debugging workflows and reduce org-level log management overhead.
+Salesforce CLI plugin to manage and analyze debug logs from the command line. Search for users by name, initiate debug sessions, download logs, and filter by keyword — without leaving the CLI.
 
-## Problem Statement
+## Installation
 
-High-volume Salesforce users (integration accounts, automated processes, batch jobs) generate many debug logs, creating challenges:
-- **Log Management**: Logs quickly hit org limits or become difficult to navigate in the Salesforce UI
-- **Search & Analysis**: Finding specific logs or patterns across many logs is time-consuming
-- **Local Development**: Developers need local access to logs for offline analysis and integration with other tools
-- **Retention**: Org logs have limited retention policies; projects need archival capability
+### Prerequisites
 
-## Core Features (MVP)
+- **Node.js 18.0.0+** — [nodejs.org](https://nodejs.org/)
+- **Salesforce CLI v2.x+** — [Install guide](https://developer.salesforce.com/docs/atlas.en-us.sfdx_setup.meta/sfdx_setup/sfdx_setup_install_cli.htm)
 
-- **Enable Debug Logging**: Initiate debug logs for specified users directly from the CLI (no UI required)
-- **Local Log Cache**: Pull and store debug logs locally with efficient indexing
-- **Fast Search**: Search logs by timestamp, user, class/trigger, log level, or custom patterns
-- **Log Export**: Export logs in multiple formats (JSON, CSV) for analysis
-- **Batch Operations**: Manage logs in bulk (enable/disable, filter, archive)
+### Install from GitHub
 
-## Target Users
+```bash
+sf plugin install https://github.com/an-unexpected-error/sf-local-logs
+```
 
-- Integration engineers managing high-volume automated processes
-- Salesforce platform developers debugging complex multi-org scenarios
-- DevOps teams analyzing system behavior through logs
-- QA teams investigating test execution logs at scale
+### Local Development
 
-## Technical Approach
+```bash
+git clone https://github.com/an-unexpected-error/sf-local-logs.git
+cd sf-local-logs
+npm install
+npm run compile
+sf plugins link . --no-verify
+```
 
-- **Salesforce CLI Plugin**: Extends `sf` CLI for seamless integration with Salesforce workflows
-- **Local Storage**: SQLite or filesystem-based log storage for fast queries
-- **Node.js**: Leverages existing Salesforce CLI ecosystem (potentially TypeScript)
-- **Incremental Sync**: Fetch only new logs since last sync to minimize API calls
+## Requirements
 
-## Success Criteria
+- **INSTALL-01**: Plugin is installable via `sf plugin install <repo>`
+- **INSTALL-02**: Plugin works with Salesforce CLI (sf) v2.x+
+- **INSTALL-03**: Plugin requires Node.js 18.0.0 or later
 
-- Successfully retrieve and cache logs from Salesforce orgs
-- Search 10,000+ logs locally in <1 second
-- Support export to at least JSON and CSV formats
-- No performance degradation with existing Salesforce CLI tools
+## Commands
+
+| Command | Namespace | Description | Phase |
+|---------|-----------|-------------|-------|
+| Search users | `sf log search` | Search for Salesforce users by name | Phase 1 |
+| Trace session | `sf log trace` | Initiate a debug log session for a user | Phase 2 |
+| Download logs | `sf log download` | Download debug logs from the org | Phase 3 |
+| Purge logs | `sf log purge` | Delete debug logs to free storage quota | Phase 3 |
+| Filter logs | `sf log filter` | Filter downloaded logs by keyword | Phase 4 |
+
+All org-connected commands accept `--target-org` to specify the target Salesforce org.
+
+Run `sf log --help` to see all available subcommands.
+
+## Development
+
+### Setup
+
+```bash
+# Compile TypeScript
+npm run compile
+
+# Link plugin locally for testing
+npm run link-local
+
+# Set up a scratch org for integration testing (requires DevHub)
+npm run setup-devorg
+```
+
+### Testing
+
+```bash
+# Run unit tests
+npm test
+
+# Run integration tests (requires authenticated DevHub org)
+npm run test:nuts
+```
+
+### Verify commands are registered
+
+```bash
+sf log --help
+```
+
+Expected output lists: `search`, `trace`, `download`, `purge`, `filter` as subcommands.
+
+## License
+
+MIT
