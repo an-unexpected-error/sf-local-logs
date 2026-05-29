@@ -1,10 +1,13 @@
 import { fileURLToPath } from 'node:url';
 import { dirname } from 'node:path';
 import { SfCommand, Flags } from '@salesforce/sf-plugins-core';
-import { Messages } from '@salesforce/core';
+import { Messages, Org } from '@salesforce/core';
 import { cli } from 'cli-ux';
+import { input } from '@inquirer/prompts';
 import { getDefaultDebugLevel, createTraceFlag, checkExistingTraceFlag, getDebugLevelName } from '../../utils/trace-helper.js';
 import { watchTraceFlag } from '../../utils/trace-monitor.js';
+import { buildSearchQuery } from '../../utils/soql-builder.js';
+import { formatRelativeDate } from '../../utils/date-formatter.js';
 import { TraceResult } from '../../types/trace.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -14,10 +17,22 @@ Messages.importMessagesDirectory(__dirname);
 const messages = Messages.loadMessages('sf-local-logs', 'log.trace');
 
 /**
+ * Represents a single user from a search result.
+ */
+interface User {
+  Id: string;
+  FirstName: string;
+  LastName: string;
+  Email: string;
+  LastLoginDate: string | null;
+}
+
+/**
  * Trace command: Initiate a debug log session for a Salesforce user.
  *
  * Creates a TraceFlag that enables Salesforce to generate debug logs for a user's activity.
- * Users can provide --user-id to directly specify a user, or use interactive search (Phase 3).
+ * By default, users enter an interactive search to find and select a user.
+ * Users can provide --user-id to directly specify a user (scripting mode).
  *
  * By default, monitors the trace flag with a progress bar showing time remaining (watch mode).
  * Users can skip watch mode with --no-watch for scripting/automation.
@@ -35,7 +50,7 @@ export default class Trace extends SfCommand<TraceResult> {
     'target-org': Flags.requiredOrg(),
     'api-version': Flags.orgApiVersion(),
     'user-id': Flags.string({
-      summary: 'Salesforce user ID to trace (required for now; interactive search coming in Phase 3)',
+      summary: 'Salesforce user ID to trace (optional; interactive search used if not provided)',
       required: false,
     }),
     'level': Flags.string({
@@ -58,14 +73,14 @@ export default class Trace extends SfCommand<TraceResult> {
     const { flags } = await this.parse(Trace);
 
     const org = flags['target-org'];
-    const userId = flags['user-id'];
+    let userId = flags['user-id'];
     const levelFlag = flags['level'];
     const noWatch = flags['no-watch'];
     const overwrite = flags['overwrite'];
 
-    // Validate --user-id provided (Phase 3 adds interactive search)
+    // If --user-id not provided, use interactive search
     if (!userId) {
-      throw new Error(messages.getMessage('errorUserIdRequired'));
+      userId = await this.selectUserInteractively(org);
     }
 
     try {
@@ -186,6 +201,105 @@ export default class Trace extends SfCommand<TraceResult> {
       // Re-throw with proper error message
       const errorMsg = error instanceof Error ? error.message : String(error);
       throw new Error(errorMsg);
+    }
+  }
+
+  /**
+   * Interactive user search: prompt for search term, display results, allow selection.
+   * If search returns no results, offer to retry with different term.
+   * If user cancels (Ctrl+C), exit cleanly with message.
+   *
+   * @param org - The authenticated Salesforce org
+   * @returns Selected user ID
+   */
+  private async selectUserInteractively(org: Org): Promise<string> {
+    try {
+      // Prompt for search term
+      const searchTerm = await input({
+        message: messages.getMessage('promptSearchTerm'),
+        validate: (val: string) => {
+          const trimmed = val.trim();
+          return trimmed.length >= 2 || messages.getMessage('errorMinLength');
+        },
+      });
+
+      // Execute search
+      const results = await this.executeSearch(org, searchTerm);
+
+      // If no results, retry
+      if (results.length === 0) {
+        this.log(messages.getMessage('messageNoUsersFound', [searchTerm]));
+        // Recursively call to retry with different search term
+        return this.selectUserInteractively(org);
+      }
+
+      // Display results in table
+      const tableData = results.map((user) => ({
+        ID: user.Id,
+        Name: `${user.FirstName} ${user.LastName}`,
+        Email: user.Email,
+        'Last Login': formatRelativeDate(user.LastLoginDate),
+      }));
+
+      cli.table(tableData, {
+        ID: { minWidth: 18 },
+        Name: {},
+        Email: {},
+        'Last Login': {},
+      });
+
+      // For now, auto-select first result (Phase 3+ can add user selection UI)
+      const selectedUserId = results[0].Id;
+      this.log(`Selected user: ${results[0].FirstName} ${results[0].LastName}`);
+      return selectedUserId;
+    } catch (error) {
+      // If user cancels (Ctrl+C), error will be caught here
+      const errorMsg = error instanceof Error ? error.message : String(error);
+      if (errorMsg.includes('User force closed the prompt')) {
+        this.log(messages.getMessage('statusSearchCancelled'));
+        process.exit(0);
+      }
+      throw error;
+    }
+  }
+
+  /**
+   * Execute a SOQL search for users matching the given term.
+   * Handles org connection, query execution, and error cases.
+   *
+   * @param org - The authenticated Salesforce org
+   * @param searchTerm - User search term (first name, last name, or both)
+   * @returns Array of matching users
+   */
+  private async executeSearch(org: Org, searchTerm: string): Promise<User[]> {
+    try {
+      this.log(messages.getMessage('statusSearching'));
+
+      const connection = org.getConnection();
+      const query = buildSearchQuery(searchTerm);
+
+      const queryResult = await connection.query<User>(query);
+      return (queryResult.records as User[]) || [];
+    } catch (error) {
+      // Determine the type of error and provide actionable guidance
+      const errorMsg = error instanceof Error ? error.message : String(error);
+
+      if (
+        errorMsg.includes('INVALID_LOGIN') ||
+        errorMsg.includes('INVALID_FIELD') ||
+        errorMsg.includes('NOT_AUTHORIZED')
+      ) {
+        throw new Error(
+          messages.getMessage('errorOrgConnectionFailed', [org.getOrgId()])
+        );
+      }
+
+      if (errorMsg.includes('REQUEST_TIMEOUT') || errorMsg.includes('ENOTFOUND')) {
+        throw new Error(messages.getMessage('errorSearchTimedOut'));
+      }
+
+      // Generic query error
+      throw new Error(messages.getMessage('errorQueryFailed'));
     }
   }
 }

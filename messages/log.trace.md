@@ -55,3 +55,27 @@ Unable to connect to org. Verify org is active and you are authenticated. Try: s
 
 # errorInvalidInput
 Invalid input. %s
+
+# promptSearchTerm
+Search for user by first or last name (e.g., 'john' or 'smith')
+
+# statusSearching
+Searching for users...
+
+# messageNoUsersFound
+No users found matching '%s'. Try searching again with different search term.
+
+# statusSearchCancelled
+Search cancelled. No trace flag created.
+
+# errorMinLength
+Search term must be at least 2 characters
+
+# errorOrgConnectionFailed
+Unable to connect to org %s. Verify org is active and you are authenticated. Try: sf org list
+
+# errorSearchTimedOut
+Search timed out. Network connection issue. Try again.
+
+# errorQueryFailed
+Search query failed. Try again or contact your Salesforce admin.
