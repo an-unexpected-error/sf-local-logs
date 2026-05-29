@@ -91,7 +91,7 @@ Plans:
 Plans:
 - [x] 02-01-PLAN.md — Install cli-progress, define TraceResult type, create trace-helper utilities (Wave 1: 3 tasks) ✓
 - [x] 02-02-PLAN.md — Implement core trace command, help text, unit tests (Wave 2: 3 tasks) ✓
-- [ ] 02-03-PLAN.md — Implement watch mode monitoring, progress bar, SIGINT handling, watch mode tests (Wave 3: 4 tasks)
+- [x] 02-03-PLAN.md — Implement watch mode monitoring, progress bar, SIGINT handling, watch mode tests (Wave 3: 4 tasks) ✓
 - [ ] 02-04-PLAN.md — Integrate interactive search, comprehensive unit tests, integration tests (Wave 4: 4 tasks + human verification)
 
 **UI hint**: yes
@@ -145,7 +145,7 @@ Plans:
 |-------|----------------|--------|-----------|
 | 0. Plugin Setup | 5/5 | Complete | 2026-05-29 |
 | 1. User Search | 1/1 | Complete | 2026-05-29 |
-| 2. Debug Sessions | 2/4 | In Progress | — |
+| 2. Debug Sessions | 3/4 | In Progress | — |
 | 3. Log Management | 0/N | Not started | — |
 | 4. Log Filtering | 0/N | Not started | — |
 
