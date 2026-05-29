@@ -37,11 +37,11 @@
     "lint": "sf-lint",
     "postpack": "shx rm -f oclif.manifest.json",
     "prepack": "sf-prepack",
-    "prepare": "sf-build",
+    "prepare": "npm run compile",
     "test": "sf-test",
     "test:nuts": "nyc mocha \"**/*.nut.ts\" --timeout 500000 --parallel",
     "version": "oclif readme",
-    "link-local": "sf plugins link . --no-verify",
+    "link-local": "sf plugins link .",
     "test-commands": "sf log search --help && sf log trace --help && sf log download --help && sf log purge --help && sf log filter --help"
   },
   "dependencies": {
