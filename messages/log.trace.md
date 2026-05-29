@@ -2,8 +2,56 @@
 Initiate a debug log session for a Salesforce user.
 
 # description
-Creates a TraceFlag for the specified user so Salesforce generates debug logs for their
-activity. Implementation coming in Phase 2.
+Creates a TraceFlag for the specified user so Salesforce generates debug logs for their activity.
+The trace flag remains active for 24 hours, during which all of the user's interactions are logged.
+By default, the command monitors the trace flag and displays a progress bar showing time remaining.
+Use --no-watch to create the flag and exit immediately (useful for scripting).
 
 # examples
 - <%= config.bin %> <%= command.id %> --user-id 005XXXXXXXXXXXXXXX --target-org my-org
+- <%= config.bin %> <%= command.id %> --user-id 005XXXXXXXXXXXXXXX --level INFO --target-org my-org
+- <%= config.bin %> <%= command.id %> --user-id 005XXXXXXXXXXXXXXX --no-watch --target-org my-org
+- <%= config.bin %> <%= command.id %> --user-id 005XXXXXXXXXXXXXXX --overwrite --target-org my-org
+- <%= config.bin %> <%= command.id %> --user-id 005XXXXXXXXXXXXXXX --json --target-org my-org
+
+# statusCreatingTrace
+Creating trace flag for %s...
+
+# statusTraceCreated
+Trace flag created successfully.
+
+# statusStoppingExistingTrace
+Stopping existing trace for %s...
+
+# statusEnteringWatchMode
+Monitoring trace flag... Press Ctrl+C to exit. Trace expires at %s.
+
+# statusTraceExpired
+Trace flag expired. No more logs will be generated.
+
+# errorUserIdRequired
+User ID required. Use --user-id <id> to specify the user to trace.
+
+# errorDebugLevelNotFound
+Unable to determine debug level. Use --level DEBUG to specify explicitly. Available levels: DEBUG, INFO, WARNING, ERROR.
+
+# errorDebugLevelFailed
+Failed to query debug level from org. %s. Try again or use --level to specify explicitly.
+
+# errorTraceCreationFailed
+Failed to create trace flag. %s. Verify you have TraceFlag creation permission.
+
+# errorActiveTraceExists
+User %s already has an active trace flag. Use --overwrite to stop the existing trace and create a new one.
+
+# errorUserNotFound
+User %s not found in this org. Verify the user ID and try again.
+
+# errorPermissionDenied
+Permission denied. You may not have permission to create trace flags. Contact your Salesforce admin. (Technical detail: %s)
+
+# errorOrgConnectionFailed
+Unable to connect to org. Verify org is active and you are authenticated. Try: sf org list
+
+# errorInvalidInput
+Invalid input. %s
