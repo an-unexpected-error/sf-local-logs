@@ -1,0 +1,68 @@
+{
+  "name": "sf-local-logs",
+  "version": "0.0.1",
+  "description": "Salesforce CLI plugin to manage and analyze debug logs from the command line",
+  "author": "Michael Cole",
+  "license": "MIT",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "files": [
+    "lib",
+    "messages",
+    "oclif.manifest.json",
+    "!lib/**/*.map"
+  ],
+  "oclif": {
+    "bin": "sf",
+    "commands": "./lib/commands",
+    "topics": {
+      "log": {
+        "description": "Manage Salesforce debug logs"
+      }
+    },
+    "plugins": [
+      "@oclif/plugin-help"
+    ],
+    "devPlugins": [
+      "@oclif/plugin-command-snapshot"
+    ]
+  },
+  "scripts": {
+    "build": "sf-build",
+    "clean": "sf-clean",
+    "compile": "tsc -p tsconfig.json",
+    "lint": "sf-lint",
+    "postpack": "shx rm -f oclif.manifest.json",
+    "prepack": "sf-prepack",
+    "prepare": "sf-build",
+    "test": "sf-test",
+    "test:nuts": "nyc mocha \"**/*.nut.ts\" --timeout 500000 --parallel",
+    "version": "oclif readme",
+    "link-local": "sf plugins link . --no-verify",
+    "test-commands": "sf log search --help && sf log trace --help && sf log download --help && sf log purge --help && sf log filter --help"
+  },
+  "dependencies": {
+    "@oclif/core": "^4",
+    "@salesforce/core": "^8.31.0",
+    "@salesforce/sf-plugins-core": "^12",
+    "chalk": "^5"
+  },
+  "devDependencies": {
+    "@oclif/plugin-command-snapshot": "^5.3.21",
+    "@oclif/plugin-help": "^6",
+    "@salesforce/cli-plugins-testkit": "^5.3.58",
+    "@salesforce/dev-scripts": "^11.0.4",
+    "@types/chai": "^4",
+    "@types/mocha": "^10",
+    "@types/node": "^18",
+    "eslint-plugin-sf-plugin": "^1.20.33",
+    "mocha": "^10",
+    "nyc": "^15",
+    "shx": "^0.3",
+    "ts-node": "^10.9.2",
+    "typescript": "5.5.4"
+  }
+}
