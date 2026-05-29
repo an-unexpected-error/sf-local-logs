@@ -4,6 +4,7 @@ import { SfCommand, Flags } from '@salesforce/sf-plugins-core';
 import { Messages } from '@salesforce/core';
 import { cli } from 'cli-ux';
 import { getDefaultDebugLevel, createTraceFlag, checkExistingTraceFlag, getDebugLevelName } from '../../utils/trace-helper.js';
+import { watchTraceFlag } from '../../utils/trace-monitor.js';
 import { TraceResult } from '../../types/trace.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -17,6 +18,9 @@ const messages = Messages.loadMessages('sf-local-logs', 'log.trace');
  *
  * Creates a TraceFlag that enables Salesforce to generate debug logs for a user's activity.
  * Users can provide --user-id to directly specify a user, or use interactive search (Phase 3).
+ *
+ * By default, monitors the trace flag with a progress bar showing time remaining (watch mode).
+ * Users can skip watch mode with --no-watch for scripting/automation.
  *
  * Implements DEBUG-01, DEBUG-02, DEBUG-03 (trace creation, debug level, confirmation),
  * UX-01, UX-02 (status messages, error handling),
@@ -137,7 +141,7 @@ export default class Trace extends SfCommand<TraceResult> {
       // Step 6: Log success message
       this.log(messages.getMessage('statusTraceCreated'));
 
-      // Step 7: Return result
+      // Step 7: Build result
       const result: TraceResult = {
         traceFlag: {
           id: traceFlagResult.id,
@@ -170,9 +174,10 @@ export default class Trace extends SfCommand<TraceResult> {
           }
         );
 
-        // Display watch mode message (Phase 3 will implement actual monitoring)
+        // Step 8: Enter watch mode if not disabled by --no-watch flag
         if (!noWatch) {
           this.log(messages.getMessage('statusEnteringWatchMode', [result.traceFlag.expirationDate]));
+          await watchTraceFlag(org, result.traceFlag.id, result.traceFlag.expirationDate, { log: this.log });
         }
       }
 
