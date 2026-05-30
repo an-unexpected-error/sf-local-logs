@@ -6,9 +6,17 @@
  * - Creating TraceFlag records
  * - Checking for existing active TraceFlags
  * - Retrieving DebugLevel names for display
+ * - Orchestrating log download after trace flag creation (D-01, D-02)
+ * - Calculating download time windows for ApexLog queries
+ * - Formatting download progress for display (D-03, DOWNLOAD-02)
  */
 
 import { Org } from '@salesforce/core';
+import { type TraceResult } from '../types/trace.js';
+import { type DownloadResult, type ApexLogRecord } from '../types/download.js';
+import { queryApexLogsForUser, calculateETA } from './download-helper.js';
+import { createSessionDirectory, constructLogFilePath } from './storage-manager.js';
+import { validateQuotaAvailable } from './quota-calculator.js';
 
 /**
  * Query org for its default DebugLevel.
@@ -204,4 +212,152 @@ export async function getDebugLevelName(org: Org, debugLevelId: string): Promise
     // In production, this would log to a debug logger
     return debugLevelId;
   }
+}
+
+/**
+ * Calculate the time window for querying ApexLog records after trace creation.
+ *
+ * Per D-02 (locked): download is scoped to the trace timeframe — logs generated from
+ * the moment the trace flag was created through its 24-hour expiry window.
+ *
+ * startTime = traceCreatedAt (logs start being generated immediately on trace creation)
+ * endTime   = traceCreatedAt + 24 hours (typical trace duration; Phase 2 D-05)
+ *
+ * @param traceCreatedAt - Date when the trace flag was created in Salesforce
+ * @returns { startTime: Date, endTime: Date } — the query window for ApexLog.StartTime
+ */
+export function calculateDownloadTimeWindow(traceCreatedAt: Date): { startTime: Date; endTime: Date } {
+  const startTime = new Date(traceCreatedAt.getTime());
+  // 24-hour trace window — matches Phase 2's trace flag ExpirationDate calculation
+  const endTime = new Date(traceCreatedAt.getTime() + 24 * 3600 * 1000);
+
+  return { startTime, endTime };
+}
+
+/**
+ * Orchestrate log download after a trace flag has been created.
+ *
+ * Implements D-01 (download integrated into trace workflow) and D-02 (download starts
+ * immediately after trace creation). Queries ApexLog records for the traced user within
+ * the 24-hour trace window, then streams each log to disk with per-file quota checks.
+ *
+ * Per D-04 (locked): quota is checked before each file download, not upfront.
+ * Per DOWNLOAD-01: logs scoped to traced user + trace timeframe.
+ * Per DOWNLOAD-02: returns data for progress display (file count, total bytes).
+ * Per T-03-07: 30s timeout on each Connection.request() call (via connection default).
+ * Per T-03-08: caller is responsible for cleaning up partial files on SIGINT.
+ *
+ * @param org - Authenticated Salesforce Org instance
+ * @param traceResult - TraceFlag result from Phase 2 trace creation (createdAt, etc.)
+ * @param userId - Salesforce User ID of the user being traced
+ * @param userName - Display name of the traced user (for session directory naming)
+ * @returns Array of DownloadResult, one per log file (empty if no logs found yet)
+ * @throws Error with quota exceeded message if validateQuotaAvailable() trips mid-download
+ */
+export async function initiateDownloadAfterTrace(
+  org: Org,
+  traceResult: TraceResult,
+  userId: string,
+  userName: string
+): Promise<DownloadResult[]> {
+  const connection = org.getConnection();
+
+  // D-02: Use trace creation time as the start of the query window
+  const traceCreatedAt = new Date(traceResult.traceFlag.expirationDate);
+  // Backtrack 24h from expirationDate to get creation time (Phase 2 always adds 24h)
+  traceCreatedAt.setTime(traceCreatedAt.getTime() - 24 * 3600 * 1000);
+
+  const { startTime, endTime } = calculateDownloadTimeWindow(traceCreatedAt);
+
+  // Query ApexLog records for the traced user within the 24-hour trace window
+  const logRecords = await queryApexLogsForUser(connection, userId, startTime, endTime);
+
+  // No logs yet: high-volume scenario where logs haven't been created yet
+  if (logRecords.length === 0) {
+    return [];
+  }
+
+  // Create session directory: ~/.local/share/sf/plugin-logs/{userName}/{YYYY-MM-DD-HH-MM}/
+  const sessionDir = await createSessionDirectory(userId, userName, traceCreatedAt);
+
+  const downloadResults: DownloadResult[] = [];
+
+  for (const log of logRecords) {
+    // D-04 (locked): check quota before each file download, not upfront
+    // Per T-03-10: consistent connection object; Salesforce quota is authoritative
+    await validateQuotaAvailable(connection, log.LogLength);
+
+    const filePath = constructLogFilePath(sessionDir, log.Id);
+
+    try {
+      // Retrieve the log body as a readable stream via Tooling API REST endpoint
+      // Per RESEARCH.md Pattern 2: GET /tooling/sobjects/ApexLog/{id}/Body
+      const logBodyStream = await connection.request({
+        method: 'GET',
+        url: `/services/data/v${connection.getApiVersion()}/tooling/sobjects/ApexLog/${log.Id}/Body`,
+      }) as NodeJS.ReadableStream;
+
+      // Stream to disk using fs.pipeline() (memory-constant regardless of file size)
+      const { streamDownloadToFile } = await import('./download-helper.js');
+      await streamDownloadToFile(logBodyStream, filePath);
+
+      downloadResults.push({
+        logId: log.Id,
+        fileName: `${log.Id}.json`,
+        filePath,
+        bytesDownloaded: log.LogLength,
+        success: true,
+      });
+    } catch (error) {
+      const errorMsg = error instanceof Error ? error.message : String(error);
+      downloadResults.push({
+        logId: log.Id,
+        fileName: `${log.Id}.json`,
+        filePath,
+        bytesDownloaded: 0,
+        success: false,
+        error: errorMsg,
+      });
+    }
+  }
+
+  return downloadResults;
+}
+
+/**
+ * Format download progress for display per D-03 and DOWNLOAD-02 requirements.
+ *
+ * D-03 (locked): display time elapsed, ETA, and file count.
+ * DOWNLOAD-02: progress shows count, size in MB, and estimated time remaining.
+ *
+ * Note: total log count is unknown because logs may be generated concurrently in
+ * high-volume scenarios. The display shows count downloaded and a rough estimate
+ * (total queried so far), not a percentage, to reflect this uncertainty.
+ *
+ * T-03-12 mitigation: numeric values only inserted into format string (no user-controlled strings).
+ *
+ * @param filesDownloaded - Number of log files successfully downloaded so far
+ * @param totalBytes - Sum of LogLength values for all downloaded files (in bytes)
+ * @param elapsedSeconds - Seconds elapsed since download started
+ * @param logRecords - All queried ApexLog records (used to estimate remaining count and bytes)
+ * @returns Formatted progress string: "Downloaded N of ~M log(s) • XMB • ETA: Ys"
+ */
+export function formatDownloadProgress(
+  filesDownloaded: number,
+  totalBytes: number,
+  elapsedSeconds: number,
+  logRecords: ApexLogRecord[]
+): string {
+  const estimatedTotal = logRecords.length;
+
+  // Total bytes across all queried records (for ETA calculation)
+  const totalQueryBytes = logRecords.reduce((sum, r) => sum + r.LogLength, 0);
+
+  const etaSeconds = calculateETA(totalBytes, totalQueryBytes, elapsedSeconds);
+  const etaDisplay = etaSeconds > 0 ? `${etaSeconds}s` : 'calculating...';
+
+  // T-03-12: sanitize numeric values — toFixed() ensures no user-controlled strings
+  const megabytes = (totalBytes / 1e6).toFixed(1);
+
+  return `Downloaded ${filesDownloaded} of ~${estimatedTotal} log(s) • ${megabytes}MB • ETA: ${etaDisplay}`;
 }
