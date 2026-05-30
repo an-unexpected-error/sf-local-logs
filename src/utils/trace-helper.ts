@@ -11,10 +11,11 @@
  * - Formatting download progress for display (D-03, DOWNLOAD-02)
  */
 
+import { Readable } from 'node:stream';
 import { Org } from '@salesforce/core';
 import { type TraceResult } from '../types/trace.js';
 import { type DownloadResult, type ApexLogRecord } from '../types/download.js';
-import { queryApexLogsForUser, calculateETA } from './download-helper.js';
+import { queryApexLogsForUser, calculateETA, streamDownloadToFile } from './download-helper.js';
 import { createSessionDirectory, constructLogFilePath } from './storage-manager.js';
 import { validateQuotaAvailable } from './quota-calculator.js';
 
@@ -290,15 +291,20 @@ export async function initiateDownloadAfterTrace(
     const filePath = constructLogFilePath(sessionDir, log.Id);
 
     try {
-      // Retrieve the log body as a readable stream via Tooling API REST endpoint
+      // Retrieve the log body via Tooling API REST endpoint
       // Per RESEARCH.md Pattern 2: GET /tooling/sobjects/ApexLog/{id}/Body
-      const logBodyStream = await connection.request({
+      // jsforce Connection.request() returns parsed JSON/text; wrap in Readable for pipeline
+      const logBody = await connection.request<string>({
         method: 'GET',
         url: `/services/data/v${connection.getApiVersion()}/tooling/sobjects/ApexLog/${log.Id}/Body`,
-      }) as NodeJS.ReadableStream;
+      });
+
+      // Convert string/buffer response to ReadableStream for streamDownloadToFile
+      // Readable.from() handles both string and Buffer inputs (DOWNLOAD-05)
+      const bodyContent = typeof logBody === 'string' ? logBody : JSON.stringify(logBody);
+      const logBodyStream = Readable.from([bodyContent]);
 
       // Stream to disk using fs.pipeline() (memory-constant regardless of file size)
-      const { streamDownloadToFile } = await import('./download-helper.js');
       await streamDownloadToFile(logBodyStream, filePath);
 
       downloadResults.push({
