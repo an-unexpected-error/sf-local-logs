@@ -18,6 +18,7 @@ import { type DownloadResult, type ApexLogRecord } from '../types/download.js';
 import { queryApexLogsForUser, calculateETA, streamDownloadToFile } from './download-helper.js';
 import { createSessionDirectory, constructLogFilePath } from './storage-manager.js';
 import { validateQuotaAvailable } from './quota-calculator.js';
+import { escapeSoql } from './soql-builder.js';
 
 /**
  * Query org for its default DebugLevel.
@@ -151,7 +152,7 @@ export async function checkExistingTraceFlag(
 
     // Query for active trace flags (ExpirationDate in future)
     const result = await connection.tooling.query(
-      `SELECT Id FROM TraceFlag WHERE TracedEntityId = '${userId}' AND ExpirationDate > ${now} LIMIT 1`
+      `SELECT Id FROM TraceFlag WHERE TracedEntityId = '${escapeSoql(userId)}' AND ExpirationDate > ${now} LIMIT 1`
     ) as { records: Array<{ Id: string }> };
 
     if (result.records.length > 0) {
