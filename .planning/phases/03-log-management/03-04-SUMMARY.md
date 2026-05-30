@@ -72,7 +72,7 @@ requirements-completed:
 
 # Metrics
 duration: 11min
-completed: 2026-05-30
+completed: 2026-05-31
 ---
 
 # Phase 03, Plan 04: Integration Test Verification Summary
@@ -84,7 +84,7 @@ completed: 2026-05-30
 - **Duration:** ~11 min
 - **Started:** 2026-05-30T13:30:05Z
 - **Completed:** 2026-05-30T13:41:05Z
-- **Tasks:** 2 (+ 1 checkpoint awaiting human sign-off)
+- **Tasks:** 3 (2 auto + 1 human checkpoint — all complete)
 - **Files modified:** 2
 
 ## Accomplishments
@@ -153,15 +153,35 @@ No new network endpoints, auth paths, or schema changes introduced in this plan.
 
 None — no external service configuration required for test files.
 
+## Human Verification Sign-Off
+
+**Status:** APPROVED (2026-05-31)
+
+The human verification checkpoint (Task 3) was signed off with the following note:
+
+> "It would be good to show a list of users (Id, Name, Username) to select from even if there is a single user, this will keep the UX consistent"
+
+### User Feedback: Consistent User Selection UX
+
+The user requested that the user selection flow always show a list — even when only a single user is found — to provide a consistent UX experience. Currently, if search returns one result, the command may auto-select the user without showing the selection list.
+
+This is a UX improvement, not a blocking issue. It is deferred to Phase 4 or a follow-up plan.
+
+**Impact:** The current behavior (auto-select on single result) works correctly and is not broken. The requested change would make the UX more predictable across all search result counts.
+
+**Suggested future implementation:**
+- In `src/commands/log/trace.ts` and any command that calls the user-search flow
+- Always show the selection list via `enquirer` / `@inquirer/select` even when `results.length === 1`
+- This aligns the single-result case with the multi-result case (consistent presentation)
+
 ## Next Phase Readiness
 
-Phase 03, Plan 04 (integration tests) is complete with all 2 auto tasks committed. The human verification checkpoint (Task 3) is the final gate for Phase 3 completion.
+Phase 03, Plan 04 (integration tests) is complete. All 3 tasks are done:
+- Task 1: NUT tests for trace+download workflow — committed `4fac043`
+- Task 2: NUT tests for purge command — committed `743a3db`
+- Task 3: Human verification checkpoint — APPROVED 2026-05-31
 
-After human sign-off:
-- Phase 3 is complete (all 13 requirements: DOWNLOAD-01–05, PURGE-01–03, UX-01–05)
-- Phase 4 (log filtering and analysis) can begin
-- sf log trace creates trace flag and downloads logs automatically
-- sf log purge deletes all org logs with confirmation and storage reporting
+Phase 3 is complete (all 13 requirements: DOWNLOAD-01–05, PURGE-01–03, UX-01–05). Phase 4 (log filtering and analysis) can begin.
 
 ## Self-Check: PASSED
 
