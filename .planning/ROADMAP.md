@@ -29,6 +29,7 @@
 **Requirements:** INSTALL-01, INSTALL-02, INSTALL-03
 
 **Success Criteria** (what must be TRUE):
+
   1. Plugin can be installed via `sf plugin install` command from the repo
   2. Plugin successfully loads and registers all commands with the Salesforce CLI
   3. Plugin verifies Node.js 18.0.0+ at install time and refuses installation on incompatible versions
@@ -37,6 +38,7 @@
 **Plans:** 5 plans (✓ 5/5 complete)
 
 Plans:
+
 - [x] 00-01-PLAN.md — Scaffold plugin (package.json, tsconfig, eslint, mocha, compile, sf plugin link) ✓
 - [x] 00-02-PLAN.md — Create 5 command stubs + messages files (sf log namespace) ✓
 - [x] 00-03-PLAN.md — Create unit test scaffolds and NUT scaffolds for all 5 commands ✓
@@ -54,6 +56,7 @@ Plans:
 **Requirements:** USER-01, USER-02, USER-03, UX-01, UX-02, UX-04, UX-05
 
 **Success Criteria** (what must be TRUE):
+
   1. User can run `sf log search --name "John"` and receive a list of matching users ✓
   2. Results are paginated when search returns many users (e.g., 10+ results), with clear "next" and "previous" navigation ✓
   3. Each search result displays user ID, name, email, and last login timestamp ✓
@@ -63,6 +66,7 @@ Plans:
 **Plans:** 1 plan (✓ 1/1 complete)
 
 Plans:
+
 - [x] 01-01-PLAN.md — Implement search command, utilities, tests, and messages (Wave 1: 6 parallel tasks) ✓
 
 **Completed:** 2026-05-29
@@ -80,6 +84,7 @@ Plans:
 **Requirements:** DEBUG-01, DEBUG-02, DEBUG-03, UX-01, UX-02, UX-04, UX-05
 
 **Success Criteria** (what must be TRUE):
+
   1. User can run `sf log trace --user-id <id>` to initiate a debug session
   2. User can specify debug level via `--level` flag or accept the org's default level
   3. CLI confirms trace flag creation with details: target user, debug level, expiry time (typically 24 hours)
@@ -89,6 +94,7 @@ Plans:
 **Plans:** 4 plans (✓ 4/4 complete)
 
 Plans:
+
 - [x] 02-01-PLAN.md — Install cli-progress, define TraceResult type, create trace-helper utilities (Wave 1: 3 tasks) ✓
 - [x] 02-02-PLAN.md — Implement core trace command, help text, unit tests (Wave 2: 3 tasks) ✓
 - [x] 02-03-PLAN.md — Implement watch mode monitoring, progress bar, SIGINT handling, watch mode tests (Wave 3: 4 tasks) ✓
@@ -109,6 +115,7 @@ Plans:
 **Requirements:** DOWNLOAD-01, DOWNLOAD-02, DOWNLOAD-03, DOWNLOAD-04, DOWNLOAD-05, PURGE-01, PURGE-02, PURGE-03, UX-01, UX-02, UX-03, UX-04, UX-05
 
 **Success Criteria** (what must be TRUE):
+
   1. User can run `sf log trace` and logs are automatically downloaded as they are created with progress updates (count, size, ETA)
   2. Plugin streams large log files (10-100MB) without consuming excessive memory
   3. Plugin checks org's remaining storage quota and warns user if download would exceed the 1GB limit
@@ -119,6 +126,7 @@ Plans:
 **Plans:** 4/4 plans complete
 
 Plans:
+
 - [x] 03-01-PLAN.md — Create types, download/storage/quota utilities, messages (Wave 1: 5 parallel tasks)
 - [x] 03-02-PLAN.md — Extend trace command with automatic download integration (Wave 2: 3 tasks)
 - [x] 03-03-PLAN.md — Implement purge command, comprehensive unit tests (Wave 3: 8 tasks)
@@ -137,6 +145,7 @@ Plans:
 **Requirements:** FILTER-01, FILTER-02, FILTER-03, UX-01, UX-02, UX-04
 
 **Success Criteria** (what must be TRUE):
+
   1. User can run `sf log trace --keyword "Account"` to download logs and filter them by keyword in one step
   2. After filtering, the terminal shows: "N log(s) matched "Account", M moved to rejected/. Logs saved to <path>"
   3. Non-matching logs are preserved in rejected/ subfolder (not deleted) — FILTER-03 via folder organization
@@ -145,12 +154,19 @@ Plans:
   6. sf log filter --help still works (stub preserved for NUT compatibility)
 
 **Plans:** 4 plans
-
 Plans:
+**Wave 1**
+
 - [ ] 04-01-PLAN.md — Test stubs: filter-helper.test.ts, keyword flag tests in trace.test.ts, updated filter.test.ts (Wave 1)
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
 - [ ] 04-02-PLAN.md — filter-helper.ts utility, FilterResult type, messages (Wave 2, parallel with 04-04)
-- [ ] 04-03-PLAN.md — trace.ts keyword flag integration and filterDownloadedLogs wiring (Wave 3)
 - [ ] 04-04-PLAN.md — Hollow out filter.ts stub, update messages/log.filter.md (Wave 2, parallel with 04-02)
+
+**Wave 3** *(blocked on Wave 2 completion)*
+
+- [ ] 04-03-PLAN.md — trace.ts keyword flag integration and filterDownloadedLogs wiring (Wave 3)
 
 **UI hint**: yes
 
@@ -175,6 +191,7 @@ Plans:
 **Coverage:** 100% ✓
 
 **Requirement Traceability:**
+
 - Phase 0: INSTALL-01, INSTALL-02, INSTALL-03 (3)
 - Phase 1: USER-01, USER-02, USER-03, UX-01, UX-02, UX-04, UX-05 (7)
 - Phase 2: DEBUG-01, DEBUG-02, DEBUG-03, UX-01, UX-02, UX-04, UX-05 (7)
