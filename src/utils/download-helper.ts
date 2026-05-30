@@ -19,6 +19,7 @@ import { type Connection } from "@salesforce/core";
 import { pipeline } from "stream/promises";
 import { createWriteStream } from "fs";
 import { type ApexLogRecord } from "../types/download.js";
+import { escapeSoql } from "./soql-builder.js";
 
 /**
  * Maximum number of records returned per Tooling API query page.
@@ -54,7 +55,7 @@ export async function queryApexLogsForUser(
   const startTimeISO = startTime.toISOString();
   const endTimeISO = endTime.toISOString();
 
-  const baseQuery = `SELECT Id, LogUserId, LogUser.Name, StartTime, LogLength, DurationMilliseconds, Status FROM ApexLog WHERE LogUserId = '${userId}' AND StartTime >= ${startTimeISO} AND StartTime <= ${endTimeISO} ORDER BY StartTime DESC`;
+  const baseQuery = `SELECT Id, LogUserId, LogUser.Name, StartTime, LogLength, DurationMilliseconds, Status FROM ApexLog WHERE LogUserId = '${escapeSoql(userId)}' AND StartTime >= ${startTimeISO} AND StartTime <= ${endTimeISO} ORDER BY StartTime DESC`;
 
   const allRecords: ApexLogRecord[] = [];
 
