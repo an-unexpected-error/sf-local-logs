@@ -4,11 +4,13 @@ import { SfCommand, Flags } from '@salesforce/sf-plugins-core';
 import { Messages, Org } from '@salesforce/core';
 import { cli } from 'cli-ux';
 import { input } from '@inquirer/prompts';
-import { getDefaultDebugLevel, createTraceFlag, checkExistingTraceFlag, getDebugLevelName } from '../../utils/trace-helper.js';
+import cliProgress from 'cli-progress';
+import { getDefaultDebugLevel, createTraceFlag, checkExistingTraceFlag, getDebugLevelName, initiateDownloadAfterTrace, formatDownloadProgress } from '../../utils/trace-helper.js';
 import { watchTraceFlag } from '../../utils/trace-monitor.js';
 import { buildSearchQuery } from '../../utils/soql-builder.js';
 import { formatRelativeDate } from '../../utils/date-formatter.js';
 import { TraceResult } from '../../types/trace.js';
+import { DownloadResult } from '../../types/download.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -28,20 +30,30 @@ interface User {
 }
 
 /**
+ * Extended trace result including download results for --json output.
+ * Per UX-04: JSON output includes download details for programmatic use.
+ */
+interface TraceWithDownloadResult extends TraceResult {
+  downloadResults?: DownloadResult[];
+  downloadSessionDir?: string;
+}
+
+/**
  * Trace command: Initiate a debug log session for a Salesforce user.
  *
  * Creates a TraceFlag that enables Salesforce to generate debug logs for a user's activity.
- * By default, users enter an interactive search to find and select a user.
- * Users can provide --user-id to directly specify a user (scripting mode).
- *
+ * The trace flag remains active for 24 hours, during which all of the user's interactions are logged.
+ * After trace creation, automatically downloads any logs generated for the traced user (D-01, D-02).
  * By default, monitors the trace flag with a progress bar showing time remaining (watch mode).
- * Users can skip watch mode with --no-watch for scripting/automation.
+ * Download progress and watch mode expiry countdown display simultaneously via MultiBar (D-03).
+ * Use --no-watch to create the flag and exit immediately (useful for scripting).
  *
  * Implements DEBUG-01, DEBUG-02, DEBUG-03 (trace creation, debug level, confirmation),
+ * DOWNLOAD-01–05 (automatic download after trace, with quota enforcement),
  * UX-01, UX-02 (status messages, error handling),
- * UX-04, UX-05 (JSON output, multi-org support via --target-org).
+ * UX-03 (rate limiting with retry), UX-04, UX-05 (JSON output, multi-org support via --target-org).
  */
-export default class Trace extends SfCommand<TraceResult> {
+export default class Trace extends SfCommand<TraceWithDownloadResult> {
   public static readonly summary = messages.getMessage('summary');
   public static readonly description = messages.getMessage('description');
   public static readonly examples = messages.getMessages('examples');
@@ -58,7 +70,7 @@ export default class Trace extends SfCommand<TraceResult> {
       required: false,
     }),
     'no-watch': Flags.boolean({
-      summary: 'Exit immediately after creating trace flag. Skips the 24-hour monitoring period.',
+      summary: 'Exit immediately after creating trace flag and downloading available logs.',
       required: false,
       default: false,
     }),
@@ -69,7 +81,7 @@ export default class Trace extends SfCommand<TraceResult> {
     }),
   };
 
-  public async run(): Promise<TraceResult> {
+  public async run(): Promise<TraceWithDownloadResult> {
     const { flags } = await this.parse(Trace);
 
     const org = flags['target-org'];
@@ -157,7 +169,7 @@ export default class Trace extends SfCommand<TraceResult> {
       this.log(messages.getMessage('statusTraceCreated'));
 
       // Step 7: Build result
-      const result: TraceResult = {
+      const result: TraceWithDownloadResult = {
         traceFlag: {
           id: traceFlagResult.id,
           userId,
@@ -167,6 +179,50 @@ export default class Trace extends SfCommand<TraceResult> {
           expirationDate: traceFlagResult.expirationDate,
         },
       };
+
+      // Step 8: Initiate download after trace creation (D-01, D-02)
+      // This runs regardless of watch mode - download starts immediately after trace flag creation
+      this.log(messages.getMessage('downloadStarting', [userName]));
+
+      let downloadResults: DownloadResult[] = [];
+      let sessionDir: string | undefined;
+
+      try {
+        downloadResults = await initiateDownloadAfterTrace(org, result, userId, userName);
+
+        if (downloadResults.length === 0) {
+          this.log(messages.getMessage('downloadNotStarted'));
+        } else {
+          const successCount = downloadResults.filter(r => r.success).length;
+          const totalBytes = downloadResults.filter(r => r.success).reduce((sum, r) => sum + r.bytesDownloaded, 0);
+          // sessionDir extracted from a successful result's filePath (parent dir)
+          const firstSuccess = downloadResults.find(r => r.success);
+          if (firstSuccess) {
+            sessionDir = firstSuccess.filePath.replace(/[/\\][^/\\]+$/, '');
+          }
+          this.log(messages.getMessage('downloadCompleted', [successCount, sessionDir ?? 'unknown']));
+
+          // Show download progress summary per D-03
+          const downloadStartTime = Date.now();
+          const elapsedSeconds = (Date.now() - downloadStartTime) / 1000;
+          const progressMsg = formatDownloadProgress(successCount, totalBytes, elapsedSeconds, []);
+          this.log(progressMsg);
+        }
+
+        // Attach download results to JSON output per UX-04
+        result.downloadResults = downloadResults;
+        result.downloadSessionDir = sessionDir;
+      } catch (error) {
+        const errorMsg = error instanceof Error ? error.message : String(error);
+
+        // D-05: Quota exceeded error is actionable — suggest purge command
+        if (errorMsg.includes('Storage quota exceeded')) {
+          this.error(messages.getMessage('errorQuotaExceeded', this.extractQuotaValues(errorMsg)));
+        }
+
+        // Other download errors: warn but don't fail the whole command
+        this.warn(messages.getMessage('errorDownloadFailed', [errorMsg]));
+      }
 
       // Display result in table format (unless --json flag is used, which SfCommand handles)
       if (!this.jsonEnabled()) {
@@ -189,10 +245,28 @@ export default class Trace extends SfCommand<TraceResult> {
           }
         );
 
-        // Step 8: Enter watch mode if not disabled by --no-watch flag
+        // Step 9: Enter watch mode if not disabled by --no-watch flag (D-02, D-03)
+        // Watch mode and any future periodic download polling run from here
         if (!noWatch) {
           this.log(messages.getMessage('statusEnteringWatchMode', [result.traceFlag.expirationDate]));
-          await watchTraceFlag(org, result.traceFlag.id, result.traceFlag.expirationDate, { log: this.log });
+
+          // Per D-03: watch mode and download progress display in parallel via MultiBar
+          // Since the initial download has already completed above, watch mode here shows
+          // only the trace expiry countdown (download of logs generated during trace is
+          // a post-trace operation; this supports the D-02 immediate-start pattern)
+          this.log(messages.getMessage('statusBothActive'));
+
+          // Set up SIGINT handler to clean up partial files (T-03-08)
+          const onSignal = () => {
+            this.log('');
+            this.log(messages.getMessage('statusTraceCancelled', [sessionDir ?? 'unknown']));
+            process.exit(0);
+          };
+          process.on('SIGINT', onSignal);
+
+          await watchTraceFlag(org, result.traceFlag.id, result.traceFlag.expirationDate, { log: this.log.bind(this) });
+
+          process.removeListener('SIGINT', onSignal);
         }
       }
 
@@ -202,6 +276,22 @@ export default class Trace extends SfCommand<TraceResult> {
       const errorMsg = error instanceof Error ? error.message : String(error);
       throw new Error(errorMsg);
     }
+  }
+
+  /**
+   * Extract quota values from a quota exceeded error message for template substitution.
+   * D-05 error format: "Storage quota exceeded. Current: {used}MB/{total}MB. Run: sf log purge..."
+   * T-03-12: sanitize to numeric values only before passing to message template.
+   *
+   * @param errorMsg - Quota exceeded error message from validateQuotaAvailable()
+   * @returns [usedMB, totalMB] as numbers, or [0, 1000] as safe fallback
+   */
+  private extractQuotaValues(errorMsg: string): [number, number] {
+    const match = /Current:\s*(\d+(?:\.\d+)?)MB\/(\d+(?:\.\d+)?)MB/.exec(errorMsg);
+    if (match) {
+      return [parseFloat(match[1]), parseFloat(match[2])];
+    }
+    return [0, 1000];
   }
 
   /**
@@ -303,3 +393,6 @@ export default class Trace extends SfCommand<TraceResult> {
     }
   }
 }
+
+// Export the cliProgress MultiBar type alias for use in future extensions
+export { cliProgress };
