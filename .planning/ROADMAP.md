@@ -12,7 +12,7 @@
 
 - [x] **Phase 0: Plugin Setup** - Project scaffolding, framework, and installation capability (✓ 2026-05-29)
 - [x] **Phase 1: User Search** - Find Salesforce users by name with paginated results (✓ 2026-05-29)
-- [ ] **Phase 2: Debug Sessions** - Initiate debug log tracing for selected users
+- [x] **Phase 2: Debug Sessions** - Initiate debug log tracing for selected users (✓ 2026-05-30)
 - [ ] **Phase 3: Log Management** - Download logs and manage storage within 1GB limit
 - [ ] **Phase 4: Log Filtering** - Filter, analyze, and export debug log data
 
@@ -86,13 +86,15 @@ Plans:
   4. User receives clear error messages if trace flag creation fails (e.g., already active trace flag, user not found)
   5. Command output includes JSON option for programmatic consumption (`--json`)
 
-**Plans:** 4 plans (1/4 complete)
+**Plans:** 4 plans (✓ 4/4 complete)
 
 Plans:
 - [x] 02-01-PLAN.md — Install cli-progress, define TraceResult type, create trace-helper utilities (Wave 1: 3 tasks) ✓
 - [x] 02-02-PLAN.md — Implement core trace command, help text, unit tests (Wave 2: 3 tasks) ✓
 - [x] 02-03-PLAN.md — Implement watch mode monitoring, progress bar, SIGINT handling, watch mode tests (Wave 3: 4 tasks) ✓
 - [x] 02-04-PLAN.md — Integrate interactive search, comprehensive unit tests, integration tests (Wave 4: 4 tasks + human verification) ✓
+
+**Completed:** 2026-05-30
 
 **UI hint**: yes
 
@@ -107,14 +109,22 @@ Plans:
 **Requirements:** DOWNLOAD-01, DOWNLOAD-02, DOWNLOAD-03, DOWNLOAD-04, DOWNLOAD-05, PURGE-01, PURGE-02, PURGE-03, UX-01, UX-02, UX-03, UX-04, UX-05
 
 **Success Criteria** (what must be TRUE):
-  1. User can run `sf log download --user-id <id>` and logs are saved to a local directory with progress updates (count, size, ETA)
+  1. User can run `sf log trace` and logs are automatically downloaded as they are created with progress updates (count, size, ETA)
   2. Plugin streams large log files (10-100MB) without consuming excessive memory
   3. Plugin checks org's remaining storage quota and warns user if download would exceed the 1GB limit
   4. Plugin refuses download if insufficient quota exists, with clear guidance on how much storage must be freed
-  5. User can run `sf log purge` to interactively select and delete logs with confirmation before deletion
+  5. User can run `sf log purge` with confirmation before deletion of all org logs
   6. After deletion, plugin confirms storage freed (e.g., "Freed 250MB")
 
-**Plans:** TBD
+**Plans:** 4 plans
+
+Plans:
+- [ ] 03-01-PLAN.md — Create types, download/storage/quota utilities, messages (Wave 1: 5 parallel tasks)
+- [ ] 03-02-PLAN.md — Extend trace command with automatic download integration (Wave 2: 3 tasks)
+- [ ] 03-03-PLAN.md — Implement purge command, comprehensive unit tests (Wave 3: 8 tasks)
+- [ ] 03-04-PLAN.md — Integration tests (NUT) and phase verification checkpoint (Wave 4: human verification)
+
+**UI hint**: yes
 
 ---
 
@@ -146,7 +156,7 @@ Plans:
 | 0. Plugin Setup | 5/5 | Complete | 2026-05-29 |
 | 1. User Search | 1/1 | Complete | 2026-05-29 |
 | 2. Debug Sessions | 4/4 | Complete | 2026-05-30 |
-| 3. Log Management | 0/N | Not started | — |
+| 3. Log Management | 4/4 | Planned | 2026-05-30 |
 | 4. Log Filtering | 0/N | Not started | — |
 
 ---
@@ -170,4 +180,4 @@ Plans:
 
 ## Next Steps
 
-1. Execute Phase 2: `/gsd-execute-phase 2`
+1. Execute Phase 3: `/gsd-execute-phase 3`
