@@ -2,8 +2,8 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-current_phase: 2
-status: In Progress — Phase 2 context captured
+current_phase: 3
+status: In Progress — Phase 3 context captured
 last_updated: "2026-05-30T00:00:00.000Z"
 progress:
   total_phases: 5
@@ -15,8 +15,8 @@ progress:
 
 # Project State: Salesforce Debug Log CLI Plugin
 
-**Last Updated:** 2026-05-29  
-**Current Phase:** 0
+**Last Updated:** 2026-05-30  
+**Current Phase:** 3
 **Milestone:** v1 MVP
 
 ---
@@ -180,11 +180,26 @@ The plugin enables this core workflow:
 - Plans verified and passed all checks
 - Ready for Phase 2 execution
 
+### Phase 3 Discussion (2026-05-30)
+
+- 4 gray areas discussed: log discovery/download scope, storage quota checking, purge UX, local storage organization
+- Key decisions locked:
+  - Download is integrated into trace workflow (not a standalone command)
+  - Auto-download after trace creation, with parallel watch mode + download progress display
+  - Storage quota monitored during download; stop immediately if quota exceeded
+  - Purge deletes all org logs with confirmation showing freed space
+  - Local storage: ~/sf-logs/{user}/{YYYY-MM-DD-HH-MM}/ (pending FS location verification)
+  - Progress display: time elapsed, ETA, file count
+- Context and discussion log committed to git
+- Critical open item: file storage location conventions for SF CLI plugins (researcher blocker)
+- Ready for Phase 3 research and planning
+
 ---
 
 ## Next Actions
 
-- [ ] Plan Phase 2 implementation (trace command, watch mode, integration with Phase 1 search)
-- [ ] Execute Phase 2 plans after approval
-- [ ] Verify all 7 Phase 2 requirements (DEBUG-01, DEBUG-02, DEBUG-03, UX-01, UX-02, UX-04, UX-05)
+- [ ] Research Phase 3 implementation (ApexLog queries, storage quota API, SF CLI file storage conventions)
+- [ ] Plan Phase 3 implementation (extended trace command with download, purge command, local storage)
+- [ ] Execute Phase 3 plans after approval
+- [ ] Verify all 13 Phase 3 requirements (DOWNLOAD-01–05, PURGE-01–03, UX-01–05)
 - [ ] Track progress via `/gsd-progress`
