@@ -106,20 +106,16 @@ See `/planning/REQUIREMENTS.md` for full requirement text.
 
 **D-08: Downloaded logs stored with user + timestamp organization**
 
-- Directory structure: `~/sf-logs/{username}/{YYYY-MM-DD-HH-MM}/`
+- Directory structure: `~/.local/share/sf/plugin-logs/{username}/{YYYY-MM-DD-HH-MM}/`
+  - **macOS:** `~/.local/share/sf/plugin-logs/{username}/{timestamp}/`
+  - **Windows:** `%APPDATA%\sf\plugin-logs\{username}\{timestamp}\`
+  - **Linux:** `~/.local/share/sf/plugin-logs/{username}/{timestamp}/`
 - Each trace session creates a timestamped folder under the user's directory
-- Human-readable naming ties logs to the user and moment they were traced
+- Uses oclif XDG Base Directory standard (same convention as other SF CLI plugins)
 
-**Why:** Aligns with workflow (user-centric debugging). Timestamp helps locate logs from a specific debugging session. Easy for admins to navigate.
+**Why:** Aligns with workflow (user-centric debugging) AND follows oclif ecosystem conventions. Timestamp helps locate logs from a specific debugging session. Uses cross-platform standard paths. Verified via GitHub discussion on Salesforce CLI conventions.
 
-**NOTE: Researcher must investigate file storage location**
-
-The use of `~/sf-logs/` assumes write access to the user's home directory. Salesforce CLI plugins may have conventions for plugin-owned directories (e.g., `~/.sf/plugin-data/`). Researcher must verify:
-- Where do other SF CLI plugins store downloaded data?
-- What are the FS access constraints for plugins?
-- Should we use `~/.sf/` or a user-configurable directory?
-
-This is a critical detail that must be resolved before planning.
+**RESOLVED (Research finding):** Salesforce CLI plugins follow oclif XDG Base Directory standard. This location is preferred over `~/sf-logs/` for consistency with the plugin ecosystem.
 
 ---
 
