@@ -79,3 +79,39 @@ Search timed out. Network connection issue. Try again.
 
 # errorQueryFailed
 Search query failed. Try again or contact your Salesforce admin.
+
+# downloadStarting
+Starting download of logs for user %s...
+
+# downloadProgress
+Downloaded %d of ~%d log(s) • %dMB • ETA: %s
+
+# downloadCompleted
+Download complete. %d log(s) saved to %s
+
+# downloadNotStarted
+No logs available yet. Logs may still be generating. Trace flag remains active.
+
+# errorQuotaExceeded
+Storage quota exceeded. Current: %dMB/%dMB. Run: sf log purge to delete old logs.
+
+# errorDownloadFailed
+Download failed: %s
+
+# errorDownloadTimeout
+Download timed out. Try again in a moment.
+
+# errorRateLimited
+Rate limited by Salesforce. Retrying in %ds...
+
+# statusBothActive
+Trace flag expiry and log download in progress...
+
+# statusWatchModeOnly
+Monitoring trace flag expiry...
+
+# statusDownloadOnly
+Downloading logs for traced user...
+
+# statusTraceCancelled
+Trace and download cancelled. Partial logs may remain in %s.
