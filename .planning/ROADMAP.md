@@ -4,7 +4,7 @@
 **Version:** 1.0  
 **Mode:** MVP (Vertical Slices)  
 **Granularity:** Standard  
-**Updated:** 2026-05-30
+**Updated:** 2026-05-31
 
 ---
 
@@ -14,7 +14,7 @@
 - [x] **Phase 1: User Search** - Find Salesforce users by name with paginated results (✓ 2026-05-29)
 - [x] **Phase 2: Debug Sessions** - Initiate debug log tracing for selected users (✓ 2026-05-30)
 - [x] **Phase 3: Log Management** - Download logs and manage storage within 1GB limit (completed 2026-05-30)
-- [ ] **Phase 4: Log Filtering** - Filter, analyze, and export debug log data
+- [ ] **Phase 4: Log Filtering** - Filter downloaded logs by keyword via sf log trace --keyword
 
 ---
 
@@ -130,20 +130,27 @@ Plans:
 
 ### Phase 4: Log Filtering
 
-**Goal:** Enable users to filter downloaded logs by keyword (SObject or Platform Event names) and export filtered results for further analysis.
+**Goal:** Enable users to filter downloaded logs by keyword (SObject or Platform Event names) via a --keyword flag on sf log trace. Non-matching logs move to a rejected/ subfolder; a summary shows match counts. (Note: sf log filter standalone command is not used — all filtering runs through sf log trace --keyword per D-01.)
 
 **Depends on:** Phase 3
 
 **Requirements:** FILTER-01, FILTER-02, FILTER-03, UX-01, UX-02, UX-04
 
 **Success Criteria** (what must be TRUE):
-  1. User can run `sf log filter --keyword "Account"` to search downloaded logs and see matching entries with line numbers
-  2. Matching log entries are visually distinguished (highlighted or marked) in the output
-  3. User can run `sf log filter --keyword "Platform_Event" --export results.txt` to save filtered results to a file
-  4. Filtered output includes context around matches (surrounding lines) to aid debugging
-  5. User can combine filtering with `--json` for programmatic export
+  1. User can run `sf log trace --keyword "Account"` to download logs and filter them by keyword in one step
+  2. After filtering, the terminal shows: "N log(s) matched "Account", M moved to rejected/. Logs saved to <path>"
+  3. Non-matching logs are preserved in rejected/ subfolder (not deleted) — FILTER-03 via folder organization
+  4. Matching logs remain in the session directory for immediate access
+  5. sf log trace --keyword --json output includes filterResult field with matched, rejected, keyword, sessionDir
+  6. sf log filter --help still works (stub preserved for NUT compatibility)
 
-**Plans:** TBD
+**Plans:** 4 plans
+
+Plans:
+- [ ] 04-01-PLAN.md — Test stubs: filter-helper.test.ts, keyword flag tests in trace.test.ts, updated filter.test.ts (Wave 1)
+- [ ] 04-02-PLAN.md — filter-helper.ts utility, FilterResult type, messages (Wave 2, parallel with 04-04)
+- [ ] 04-03-PLAN.md — trace.ts keyword flag integration and filterDownloadedLogs wiring (Wave 3)
+- [ ] 04-04-PLAN.md — Hollow out filter.ts stub, update messages/log.filter.md (Wave 2, parallel with 04-02)
 
 **UI hint**: yes
 
@@ -157,7 +164,7 @@ Plans:
 | 1. User Search | 1/1 | Complete | 2026-05-29 |
 | 2. Debug Sessions | 4/4 | Complete | 2026-05-30 |
 | 3. Log Management | 4/4 | Complete    | 2026-05-30 |
-| 4. Log Filtering | 0/N | Not started | — |
+| 4. Log Filtering | 0/4 | Not started | — |
 
 ---
 
@@ -180,4 +187,4 @@ Plans:
 
 ## Next Steps
 
-1. Execute Phase 3: `/gsd-execute-phase 3`
+1. Execute Phase 4: `/gsd-execute-phase 4`
