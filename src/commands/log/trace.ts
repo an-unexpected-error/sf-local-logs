@@ -7,7 +7,7 @@ import { input } from '@inquirer/prompts';
 import cliProgress from 'cli-progress';
 import { getDefaultDebugLevel, createTraceFlag, checkExistingTraceFlag, getDebugLevelName, initiateDownloadAfterTrace, formatDownloadProgress } from '../../utils/trace-helper.js';
 import { watchTraceFlag } from '../../utils/trace-monitor.js';
-import { buildSearchQuery } from '../../utils/soql-builder.js';
+import { buildSearchQuery, escapeSoql } from '../../utils/soql-builder.js';
 import { formatRelativeDate } from '../../utils/date-formatter.js';
 import { TraceResult } from '../../types/trace.js';
 import { DownloadResult } from '../../types/download.js';
@@ -141,7 +141,7 @@ export default class Trace extends SfCommand<TraceWithDownloadResult> {
       try {
         const connection = org.getConnection(flags['api-version']);
         const userResult = await connection.query<{ FirstName: string; LastName: string; Email: string }>(
-          `SELECT FirstName, LastName, Email FROM User WHERE Id = '${userId}' LIMIT 1`
+          `SELECT FirstName, LastName, Email FROM User WHERE Id = '${escapeSoql(userId)}' LIMIT 1`
         );
         if (userResult.records.length > 0) {
           const user = userResult.records[0];
