@@ -3,7 +3,7 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 current_phase: 3
-status: In Progress — Phase 3 context captured
+status: In Progress — Phase 3 plans created and verified
 last_updated: "2026-05-30T00:00:00.000Z"
 progress:
   total_phases: 5
@@ -179,6 +179,20 @@ The plugin enables this core workflow:
 - All 7 phase requirements covered (DEBUG-01, DEBUG-02, DEBUG-03, UX-01, UX-02, UX-04, UX-05)
 - Plans verified and passed all checks
 - Ready for Phase 2 execution
+
+### Phase 3 Planning (2026-05-30)
+
+- Research completed: ApexLog API, storage quota, streaming I/O, SF CLI file storage conventions
+  - Critical blocker resolved: file storage location should use ~/.local/share/sf/plugin-logs/ (oclif standard)
+  - All technical patterns verified; no new package dependencies needed
+- 4 plans created in 4 waves:
+  - Wave 1: Foundation (5 tasks) — types, download-helper, storage-manager, quota-calculator
+  - Wave 2: Download integration (3 tasks) — extend trace command with streaming + quota checking
+  - Wave 3: Purge command + tests (8 tasks) — 175+ test cases (unit + integration)
+  - Wave 4: Verification gate (2 tasks + checkpoint) — NUT tests, human sign-off
+- All 13 Phase 3 requirements mapped to plans (DOWNLOAD-01–05, PURGE-01–03, UX-01–05)
+- Plan verification: 1 iteration (added read_first sections to all 18 tasks)
+- Plans committed to git; ready for execution
 
 ### Phase 3 Discussion (2026-05-30)
 
