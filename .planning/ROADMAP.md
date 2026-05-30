@@ -13,7 +13,7 @@
 - [x] **Phase 0: Plugin Setup** - Project scaffolding, framework, and installation capability (✓ 2026-05-29)
 - [x] **Phase 1: User Search** - Find Salesforce users by name with paginated results (✓ 2026-05-29)
 - [x] **Phase 2: Debug Sessions** - Initiate debug log tracing for selected users (✓ 2026-05-30)
-- [ ] **Phase 3: Log Management** - Download logs and manage storage within 1GB limit
+- [x] **Phase 3: Log Management** - Download logs and manage storage within 1GB limit (completed 2026-05-30)
 - [ ] **Phase 4: Log Filtering** - Filter, analyze, and export debug log data
 
 ---
@@ -116,13 +116,13 @@ Plans:
   5. User can run `sf log purge` with confirmation before deletion of all org logs
   6. After deletion, plugin confirms storage freed (e.g., "Freed 250MB")
 
-**Plans:** 4 plans
+**Plans:** 4/4 plans complete
 
 Plans:
-- [ ] 03-01-PLAN.md — Create types, download/storage/quota utilities, messages (Wave 1: 5 parallel tasks)
-- [ ] 03-02-PLAN.md — Extend trace command with automatic download integration (Wave 2: 3 tasks)
-- [ ] 03-03-PLAN.md — Implement purge command, comprehensive unit tests (Wave 3: 8 tasks)
-- [ ] 03-04-PLAN.md — Integration tests (NUT) and phase verification checkpoint (Wave 4: human verification)
+- [x] 03-01-PLAN.md — Create types, download/storage/quota utilities, messages (Wave 1: 5 parallel tasks)
+- [x] 03-02-PLAN.md — Extend trace command with automatic download integration (Wave 2: 3 tasks)
+- [x] 03-03-PLAN.md — Implement purge command, comprehensive unit tests (Wave 3: 8 tasks)
+- [x] 03-04-PLAN.md — Integration tests (NUT) and phase verification checkpoint (Wave 4: human verification)
 
 **UI hint**: yes
 
@@ -156,7 +156,7 @@ Plans:
 | 0. Plugin Setup | 5/5 | Complete | 2026-05-29 |
 | 1. User Search | 1/1 | Complete | 2026-05-29 |
 | 2. Debug Sessions | 4/4 | Complete | 2026-05-30 |
-| 3. Log Management | 4/4 | Planned | 2026-05-30 |
+| 3. Log Management | 4/4 | Complete   | 2026-05-30 |
 | 4. Log Filtering | 0/N | Not started | — |
 
 ---

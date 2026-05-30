@@ -19,11 +19,11 @@
 
 ### Log Download
 
-- [ ] **DOWNLOAD-01**: User can download debug logs as they are created
-- [ ] **DOWNLOAD-02**: Plugin displays progress (count, size, ETA) while downloading
-- [ ] **DOWNLOAD-03**: Plugin respects organization's 1GB debug log storage limit
-- [ ] **DOWNLOAD-04**: Plugin warns user if download would exceed remaining storage quota
-- [ ] **DOWNLOAD-05**: Plugin uses streaming I/O to handle 10-100MB log files without memory issues
+- [x] **DOWNLOAD-01**: User can download debug logs as they are created
+- [x] **DOWNLOAD-02**: Plugin displays progress (count, size, ETA) while downloading
+- [x] **DOWNLOAD-03**: Plugin respects organization's 1GB debug log storage limit
+- [x] **DOWNLOAD-04**: Plugin warns user if download would exceed remaining storage quota
+- [x] **DOWNLOAD-05**: Plugin uses streaming I/O to handle 10-100MB log files without memory issues
 
 ### Log Filtering
 
@@ -33,17 +33,17 @@
 
 ### Log Management
 
-- [ ] **PURGE-01**: User can delete debug log files to free storage quota
-- [ ] **PURGE-02**: User receives confirmation before deleting logs
-- [ ] **PURGE-03**: Plugin displays storage freed after deletion
+- [x] **PURGE-01**: User can delete debug log files to free storage quota
+- [x] **PURGE-02**: User receives confirmation before deleting logs
+- [x] **PURGE-03**: Plugin displays storage freed after deletion
 
 ### User Experience
 
-- [ ] **UX-01**: CLI displays status messages clearly explaining what's happening at each step
-- [ ] **UX-02**: Error messages provide actionable remediation guidance
-- [ ] **UX-03**: Plugin handles rate limiting gracefully with exponential backoff
-- [ ] **UX-04**: All commands support `--json` output for programmatic use
-- [ ] **UX-05**: Plugin respects `--target-org` flag for multi-org environments
+- [x] **UX-01**: CLI displays status messages clearly explaining what's happening at each step
+- [x] **UX-02**: Error messages provide actionable remediation guidance
+- [x] **UX-03**: Plugin handles rate limiting gracefully with exponential backoff
+- [x] **UX-04**: All commands support `--json` output for programmatic use
+- [x] **UX-05**: Plugin respects `--target-org` flag for multi-org environments
 
 ### Installation & Compatibility
 
@@ -105,22 +105,22 @@ Which phases cover which requirements. Updated during roadmap creation.
 | DEBUG-01 | Phase 2 | Pending |
 | DEBUG-02 | Phase 2 | Pending |
 | DEBUG-03 | Phase 2 | Pending |
-| DOWNLOAD-01 | Phase 3 | Pending |
-| DOWNLOAD-02 | Phase 3 | Pending |
-| DOWNLOAD-03 | Phase 3 | Pending |
-| DOWNLOAD-04 | Phase 3 | Pending |
-| DOWNLOAD-05 | Phase 3 | Pending |
+| DOWNLOAD-01 | Phase 3 | Complete |
+| DOWNLOAD-02 | Phase 3 | Complete |
+| DOWNLOAD-03 | Phase 3 | Complete |
+| DOWNLOAD-04 | Phase 3 | Complete |
+| DOWNLOAD-05 | Phase 3 | Complete |
 | FILTER-01 | Phase 4 | Pending |
 | FILTER-02 | Phase 4 | Pending |
 | FILTER-03 | Phase 4 | Pending |
-| PURGE-01 | Phase 3 | Pending |
-| PURGE-02 | Phase 3 | Pending |
-| PURGE-03 | Phase 3 | Pending |
-| UX-01 | All | Pending |
-| UX-02 | All | Pending |
-| UX-03 | All | Pending |
-| UX-04 | All | Pending |
-| UX-05 | All | Pending |
+| PURGE-01 | Phase 3 | Complete |
+| PURGE-02 | Phase 3 | Complete |
+| PURGE-03 | Phase 3 | Complete |
+| UX-01 | All | Complete |
+| UX-02 | All | Complete |
+| UX-03 | All | Complete |
+| UX-04 | All | Complete |
+| UX-05 | All | Complete |
 | INSTALL-01 | Phase 0 | Pending |
 | INSTALL-02 | Phase 0 | Pending |
 | INSTALL-03 | Phase 0 | Pending |
