@@ -12,7 +12,9 @@ import { formatRelativeDate } from '../../utils/date-formatter.js';
 import { TraceResult } from '../../types/trace.js';
 import { DownloadResult } from '../../types/download.js';
 
+// eslint-disable-next-line @typescript-eslint/naming-convention
 const __filename = fileURLToPath(import.meta.url);
+// eslint-disable-next-line @typescript-eslint/naming-convention
 const __dirname = dirname(__filename);
 
 Messages.importMessagesDirectory(__dirname);
@@ -21,22 +23,22 @@ const messages = Messages.loadMessages('sf-local-logs', 'log.trace');
 /**
  * Represents a single user from a search result.
  */
-interface User {
+type User = {
   Id: string;
   FirstName: string;
   LastName: string;
   Email: string;
   LastLoginDate: string | null;
-}
+};
 
 /**
  * Extended trace result including download results for --json output.
  * Per UX-04: JSON output includes download details for programmatic use.
  */
-interface TraceWithDownloadResult extends TraceResult {
+type TraceWithDownloadResult = TraceResult & {
   downloadResults?: DownloadResult[];
   downloadSessionDir?: string;
-}
+};
 
 /**
  * Trace command: Initiate a debug log session for a Salesforce user.
@@ -62,20 +64,20 @@ export default class Trace extends SfCommand<TraceWithDownloadResult> {
     'target-org': Flags.requiredOrg(),
     'api-version': Flags.orgApiVersion(),
     'user-id': Flags.string({
-      summary: 'Salesforce user ID to trace (optional; interactive search used if not provided)',
+      summary: messages.getMessage('flagUserId'),
       required: false,
     }),
     'level': Flags.string({
-      summary: 'Debug level to apply (DEBUG, INFO, WARNING, ERROR). Omit to use org default.',
+      summary: messages.getMessage('flagLevel'),
       required: false,
     }),
     'no-watch': Flags.boolean({
-      summary: 'Exit immediately after creating trace flag and downloading available logs.',
+      summary: messages.getMessage('flagNoWatch'),
       required: false,
       default: false,
     }),
     'overwrite': Flags.boolean({
-      summary: 'Stop the existing active trace flag and create a new one.',
+      summary: messages.getMessage('flagOverwrite'),
       required: false,
       default: false,
     }),
@@ -112,14 +114,9 @@ export default class Trace extends SfCommand<TraceWithDownloadResult> {
       }
 
       // Step 2: Check for existing active trace flag
-      try {
-        await checkExistingTraceFlag(org, userId, overwrite);
-        if (overwrite) {
-          this.log(messages.getMessage('statusStoppingExistingTrace', [userId]));
-        }
-      } catch (error) {
-        // Re-throw error from checkExistingTraceFlag (either "already exists" or other)
-        throw error;
+      await checkExistingTraceFlag(org, userId, overwrite);
+      if (overwrite) {
+        this.log(messages.getMessage('statusStoppingExistingTrace', [userId]));
       }
 
       // Step 3: Create new TraceFlag
@@ -142,7 +139,7 @@ export default class Trace extends SfCommand<TraceWithDownloadResult> {
       let userName = userId;
       let userEmail = 'unknown';
       try {
-        const connection = org.getConnection();
+        const connection = org.getConnection(flags['api-version']);
         const userResult = await connection.query<{ FirstName: string; LastName: string; Email: string }>(
           `SELECT FirstName, LastName, Email FROM User WHERE Id = '${userId}' LIMIT 1`
         );
@@ -217,7 +214,7 @@ export default class Trace extends SfCommand<TraceWithDownloadResult> {
 
         // D-05: Quota exceeded error is actionable — suggest purge command
         if (errorMsg.includes('Storage quota exceeded')) {
-          this.error(messages.getMessage('errorQuotaExceeded', this.extractQuotaValues(errorMsg)));
+          this.error(messages.getMessage('errorQuotaExceeded', Trace.extractQuotaValues(errorMsg)));
         }
 
         // Other download errors: warn but don't fail the whole command
@@ -257,7 +254,7 @@ export default class Trace extends SfCommand<TraceWithDownloadResult> {
           this.log(messages.getMessage('statusBothActive'));
 
           // Set up SIGINT handler to clean up partial files (T-03-08)
-          const onSignal = () => {
+          const onSignal = (): void => {
             this.log('');
             this.log(messages.getMessage('statusTraceCancelled', [sessionDir ?? 'unknown']));
             process.exit(0);
@@ -286,7 +283,7 @@ export default class Trace extends SfCommand<TraceWithDownloadResult> {
    * @param errorMsg - Quota exceeded error message from validateQuotaAvailable()
    * @returns [usedMB, totalMB] as numbers, or [0, 1000] as safe fallback
    */
-  private extractQuotaValues(errorMsg: string): [number, number] {
+  private static extractQuotaValues(errorMsg: string): [number, number] {
     const match = /Current:\s*(\d+(?:\.\d+)?)MB\/(\d+(?:\.\d+)?)MB/.exec(errorMsg);
     if (match) {
       return [parseFloat(match[1]), parseFloat(match[2])];

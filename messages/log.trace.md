@@ -115,3 +115,15 @@ Downloading logs for traced user...
 
 # statusTraceCancelled
 Trace and download cancelled. Partial logs may remain in %s.
+
+# flagUserId
+Salesforce user ID to trace (optional; interactive search used if not provided)
+
+# flagLevel
+Debug level to apply (DEBUG, INFO, WARNING, ERROR). Omit to use org default.
+
+# flagNoWatch
+Exit immediately after creating trace flag and downloading available logs.
+
+# flagOverwrite
+Stop the existing active trace flag and create a new one.
