@@ -20,7 +20,7 @@ import {
   getRemainingQuotaFallback,
   validateQuotaAvailable,
   formatQuotaMessage,
-} from '../../../src/utils/quota-calculator.js';
+} from '../../src/utils/quota-calculator.js';
 
 describe('getRemainingQuota', () => {
   it('is exported as an async function', () => {

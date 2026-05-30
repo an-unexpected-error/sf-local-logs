@@ -20,7 +20,7 @@ import {
   executeWithRetry,
   calculateETA,
   streamDownloadToFile,
-} from '../../../src/utils/download-helper.js';
+} from '../../src/utils/download-helper.js';
 
 describe('queryApexLogsForUser', () => {
   it('is exported as an async function', () => {
@@ -44,7 +44,7 @@ describe('queryApexLogsForUser', () => {
     );
     expect(result).to.be.instanceOf(Promise);
     // Consume the promise to avoid unhandled rejections in the test runner
-    return result.then((records) => {
+    return result.then((records: unknown[]) => {
       expect(records).to.be.an('array');
     });
   });
@@ -306,22 +306,9 @@ describe('streamDownloadToFile', () => {
   });
 
   it('returns a Promise (async function)', () => {
-    // Verify it returns a thenable when called with minimal valid stubs
-    const { Readable, Writable } = require('stream');
-    const readable = new Readable({ read() {} });
-    const writable = new Writable({
-      write(_chunk: Buffer, _enc: BufferEncoding, cb: () => void) {
-        cb();
-      },
-    });
-    readable.push('test data');
-    readable.push(null); // Signal end of stream
-
-    // Override createWriteStream by passing a mock path — we test error-free operation
-    // For this structural test, we verify the function signature and return type
+    // Verify function type — real pipeline tests require a valid file path
+    // which is covered in integration tests (Wave 4)
     expect(typeof streamDownloadToFile).to.equal('function');
-    // Return to avoid hanging
-    return Promise.resolve();
   });
 
   it('error from pipeline is propagated (not swallowed)', async () => {
