@@ -54,6 +54,23 @@ describe('Trace Command', () => {
       expect(Trace.flags['target-org']).to.exist;
     });
 
+    it('keyword flag is present', function () {
+      // Wave 0 stub: keyword flag added in Plan 03 (trace.ts extension)
+      // Test is pending until Plan 03 adds Flags.string({ char: 'k', ... }) to Trace.flags
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const flags = Trace.flags as Record<string, any>;
+      if (!flags['keyword']) { this.skip(); }
+      expect(flags['keyword']).to.exist;
+    });
+
+    it('keyword flag is optional string', function () {
+      // Wave 0 stub: keyword flag required=false per D-05 (single string, required: false)
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const flags = Trace.flags as Record<string, any>;
+      if (!flags['keyword']) { this.skip(); }
+      expect(flags['keyword'].required).to.be.false;
+    });
+
     it('api-version flag is present', () => {
       expect(Trace.flags['api-version']).to.exist;
     });
@@ -102,6 +119,16 @@ describe('Trace Command', () => {
 
     it('overwrite flag has description', () => {
       const flagConfig = Trace.flags['overwrite'] as { summary?: string };
+      expect(flagConfig.summary).to.be.a('string');
+      expect(flagConfig.summary?.length).to.be.greaterThan(0);
+    });
+
+    it('keyword flag has summary description', function () {
+      // Wave 0 stub: keyword flag summary added in Plan 03 via messages.getMessage('flagKeyword')
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const flags = Trace.flags as Record<string, any>;
+      if (!flags['keyword']) { this.skip(); }
+      const flagConfig = flags['keyword'] as { summary?: string };
       expect(flagConfig.summary).to.be.a('string');
       expect(flagConfig.summary?.length).to.be.greaterThan(0);
     });
@@ -372,6 +399,33 @@ describe('Trace Command', () => {
       // Verified by code review: TraceResult returned with all user details
       expect(true).to.be.true;
     });
+  });
+});
+
+// =============================================================================
+// Filter Integration Tests (Phase 4, Plan 01 Wave 0 stubs)
+// =============================================================================
+
+describe('Filter Integration (keyword flag)', () => {
+  it('keyword flag char is k', function () {
+    // Wave 0 stub: --keyword / -k flag added in Plan 03
+    // char: 'k' per Pattern 4 in RESEARCH.md and D-05 (single string)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const flags = Trace.flags as Record<string, any>;
+    if (!flags['keyword']) { this.skip(); }
+    expect((flags['keyword'] as { char?: string }).char).to.equal('k');
+  });
+
+  it('filterResult is optional in TraceWithDownloadResult shape', function () {
+    // Wave 0 stub: filterResult field added in Plan 03 extension of TraceWithDownloadResult
+    // type: TraceResult & { downloadResults?: DownloadResult[]; filterResult?: FilterResult }
+    // Pending until Plan 03 adds filterResult to the type and trace.ts run() method
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const flags = Trace.flags as Record<string, any>;
+    if (!flags['keyword']) { this.skip(); }
+    // TypeScript structural test — verify trace.ts source references filterResult
+    const source = Trace.toString();
+    expect(source).to.include('filterResult');
   });
 });
 
