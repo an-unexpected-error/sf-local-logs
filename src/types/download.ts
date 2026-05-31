@@ -98,3 +98,22 @@ export interface DownloadSessionMetadata {
   /** Formatted timestamp used as the session directory name (YYYY-MM-DD-HH-MM) */
   sessionTimestamp: string;
 }
+
+/**
+ * Result of a keyword filter operation on a download session.
+ * Returned by filterDownloadedLogs() and attached to TraceWithDownloadResult.filterResult
+ * for --json output (UX-04).
+ *
+ * Non-matching logs are moved to sessionDir/rejected/ (D-07).
+ * Matching logs remain in sessionDir (D-06).
+ */
+export interface FilterResult {
+  /** The keyword used for filtering (from --keyword flag) */
+  keyword: string;
+  /** Count of logs that contained the keyword */
+  matched: number;
+  /** Count of logs moved to rejected/ subfolder */
+  rejected: number;
+  /** Absolute path to the session directory */
+  sessionDir: string;
+}
