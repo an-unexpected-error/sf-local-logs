@@ -93,10 +93,10 @@ export async function createTraceFlag(
     const startTime = new Date();
     const expirationDate = new Date(startTime.getTime() + 24 * 3600 * 1000);
 
+    // StartTime is read-only on TraceFlag; Salesforce sets it automatically
     const result = await connection.tooling.create('TraceFlag', {
       TracedEntityId: userId,
       DebugLevelId: debugLevelId,
-      StartTime: startTime.toISOString(),
       ExpirationDate: expirationDate.toISOString(),
     }) as { id?: string; success?: boolean; errors?: Array<{ message: string }> };
 
