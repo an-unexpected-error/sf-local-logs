@@ -3,13 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 current_phase: 04
-status: Milestone complete
-last_updated: "2026-05-31T10:09:25.890Z"
+status: Milestone complete + quick fix applied
+last_updated: "2026-05-31T11:45:00.000Z"
 progress:
   total_phases: 5
   completed_phases: 4
   total_plans: 18
   completed_plans: 17
+  quick_tasks: 1
   percent: 80
 ---
 
@@ -220,7 +221,14 @@ The plugin enables this core workflow:
 - [ ] Verify all 13 Phase 3 requirements (DOWNLOAD-01–05, PURGE-01–03, UX-01–05)
 - [ ] Track progress via `/gsd-progress`
 
+## Quick Tasks Completed
+
+| # | Description | Date | Commit | Directory |
+|---|-------------|------|--------|-----------|
+| 260531-u75 | Fix TraceFlag creation: Remove read-only StartTime field | 2026-05-31 | 76dd3b7 | [260531-u75-fix-traceflag-creation-error-1-no-such-c/](.planning/quick/260531-u75-fix-traceflag-creation-error-1-no-such-c/) |
+
 ## Decisions
 
 - [Phase ?]: Code review assertions used instead of live org tests: full E2E requires authenticated devhub + scratch org; structural assertions verify all implementation patterns without infrastructure
 - [Phase ?]: Always show user selection list even for single result: consistent UX across all search result counts (deferred to Phase 4)
+- [Quick 260531-u75]: TraceFlag StartTime field is read-only on Salesforce Tooling API; removed from create payload to fix "No such column 'StartTime'" error
