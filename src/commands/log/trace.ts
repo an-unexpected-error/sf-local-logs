@@ -10,7 +10,8 @@ import { watchTraceFlag } from '../../utils/trace-monitor.js';
 import { buildSearchQuery, escapeSoql } from '../../utils/soql-builder.js';
 import { formatRelativeDate } from '../../utils/date-formatter.js';
 import { TraceResult } from '../../types/trace.js';
-import { DownloadResult } from '../../types/download.js';
+import { DownloadResult, FilterResult } from '../../types/download.js';
+import { filterDownloadedLogs } from '../../utils/filter-helper.js';
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
 const __filename = fileURLToPath(import.meta.url);
@@ -38,6 +39,7 @@ type User = {
 type TraceWithDownloadResult = TraceResult & {
   downloadResults?: DownloadResult[];
   downloadSessionDir?: string;
+  filterResult?: FilterResult;
 };
 
 /**
@@ -81,6 +83,11 @@ export default class Trace extends SfCommand<TraceWithDownloadResult> {
       required: false,
       default: false,
     }),
+    'keyword': Flags.string({
+      char: 'k',
+      summary: messages.getMessage('flagKeyword'),
+      required: false,
+    }),
   };
 
   public async run(): Promise<TraceWithDownloadResult> {
@@ -91,6 +98,7 @@ export default class Trace extends SfCommand<TraceWithDownloadResult> {
     const levelFlag = flags['level'];
     const noWatch = flags['no-watch'];
     const overwrite = flags['overwrite'];
+    const keyword = flags['keyword'];
 
     // If --user-id not provided, use interactive search
     if (!userId) {
@@ -219,6 +227,28 @@ export default class Trace extends SfCommand<TraceWithDownloadResult> {
 
         // Other download errors: warn but don't fail the whole command
         this.warn(messages.getMessage('errorDownloadFailed', [errorMsg]));
+      }
+
+      // Step 9: Filter downloaded logs if --keyword is provided
+      if (keyword) {
+        if (!sessionDir || downloadResults.length === 0) {
+          this.log(messages.getMessage('filterSkippedNoDownloads'));
+        } else {
+          try {
+            const filterResultRaw = await filterDownloadedLogs(sessionDir, keyword);
+            const filterResult: FilterResult = { keyword, ...filterResultRaw };
+            this.log(messages.getMessage('filterSummary', [
+              filterResult.matched,
+              keyword,
+              filterResult.rejected,
+              filterResult.sessionDir,
+            ]));
+            result.filterResult = filterResult;
+          } catch (error) {
+            const errorMsg = error instanceof Error ? error.message : String(error);
+            this.warn(messages.getMessage('filterError', [errorMsg, sessionDir]));
+          }
+        }
       }
 
       // Display result in table format (unless --json flag is used, which SfCommand handles)
