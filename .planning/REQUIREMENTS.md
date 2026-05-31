@@ -27,9 +27,9 @@
 
 ### Log Filtering
 
-- [ ] **FILTER-01**: User can filter downloaded logs by keyword (SObject or Platform Event name)
-- [ ] **FILTER-02**: Filtered results are displayed with matching log entries highlighted
-- [ ] **FILTER-03**: User can export filtered results to a file
+- [x] **FILTER-01**: User can filter downloaded logs by keyword (SObject or Platform Event name)
+- [x] **FILTER-02**: Filtered results are displayed with matching log entries highlighted
+- [x] **FILTER-03**: User can export filtered results to a file
 
 ### Log Management
 
@@ -110,9 +110,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 | DOWNLOAD-03 | Phase 3 | Complete |
 | DOWNLOAD-04 | Phase 3 | Complete |
 | DOWNLOAD-05 | Phase 3 | Complete |
-| FILTER-01 | Phase 4 | Pending |
-| FILTER-02 | Phase 4 | Pending |
-| FILTER-03 | Phase 4 | Pending |
+| FILTER-01 | Phase 4 | Complete |
+| FILTER-02 | Phase 4 | Complete |
+| FILTER-03 | Phase 4 | Complete |
 | PURGE-01 | Phase 3 | Complete |
 | PURGE-02 | Phase 3 | Complete |
 | PURGE-03 | Phase 3 | Complete |
@@ -126,6 +126,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | INSTALL-03 | Phase 0 | Pending |
 
 **Coverage:**
+
 - v1 requirements: 26 total
 - Mapped to phases: 26
 - Unmapped: 0 ✓
