@@ -127,3 +127,15 @@ Exit immediately after creating trace flag and downloading available logs.
 
 # flagOverwrite
 Stop the existing active trace flag and create a new one.
+
+# flagKeyword
+Filter downloaded logs by keyword. Matching logs stay in the session directory; non-matching logs move to rejected/.
+
+# filterSummary
+%d log(s) matched "%s", %d moved to rejected/. Logs saved to %s
+
+# filterSkippedNoDownloads
+No logs downloaded — skipping keyword filter.
+
+# filterError
+Keyword filtering failed: %s. All logs remain in %s
