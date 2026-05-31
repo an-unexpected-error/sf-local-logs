@@ -1,6 +1,6 @@
 import { fileURLToPath } from 'node:url';
 import { dirname } from 'node:path';
-import { SfCommand, Flags } from '@salesforce/sf-plugins-core';
+import { SfCommand } from '@salesforce/sf-plugins-core';
 import { Messages } from '@salesforce/core';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -9,31 +9,15 @@ const __dirname = dirname(__filename);
 Messages.importMessagesDirectory(__dirname);
 const messages = Messages.loadMessages('sf-local-logs', 'log.filter');
 
-export type FilterResult = {
-  matches: Array<{ file: string; line: number; content: string }>;
-};
-
-export default class Filter extends SfCommand<FilterResult> {
+export default class Filter extends SfCommand<Record<string, never>> {
   public static readonly summary = messages.getMessage('summary');
   public static readonly description = messages.getMessage('description');
   public static readonly examples = messages.getMessages('examples');
 
-  public static readonly flags = {
-    keyword: Flags.string({
-      char: 'k',
-      summary: 'Keyword to filter for',
-      required: false,
-    }),
-    export: Flags.string({
-      char: 'e',
-      summary: 'File path to export results',
-      required: false,
-    }),
-  };
+  public static readonly flags = {};
 
-  public async run(): Promise<FilterResult> {
-    await this.parse(Filter);
-    this.log('Log filtering coming in Phase 4');
-    return { matches: [] };
+  public async run(): Promise<Record<string, never>> {
+    this.log('Use `sf log trace --keyword <keyword>` to filter downloaded logs. The standalone filter command is not available in v1.');
+    return {};
   }
 }

@@ -2,10 +2,7 @@
 Filter downloaded debug logs by keyword.
 
 # description
-Searches downloaded log files for a keyword (SObject name or Platform Event name).
-Displays matching lines with surrounding context. Supports export to file.
-Implementation coming in Phase 4.
+Filtering is now integrated into the trace workflow. Use `sf log trace --keyword <keyword>` to filter downloaded logs by keyword. Matching logs remain in the session directory; non-matching logs move to rejected/.
 
 # examples
-- <%= config.bin %> <%= command.id %> --keyword "Account"
-- <%= config.bin %> <%= command.id %> --keyword "OrderEvent__e" --export results.txt
+- <%= config.bin %> log trace --keyword "Account" --target-org my-org
