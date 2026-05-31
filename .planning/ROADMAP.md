@@ -14,7 +14,7 @@
 - [x] **Phase 1: User Search** - Find Salesforce users by name with paginated results (✓ 2026-05-29)
 - [x] **Phase 2: Debug Sessions** - Initiate debug log tracing for selected users (✓ 2026-05-30)
 - [x] **Phase 3: Log Management** - Download logs and manage storage within 1GB limit (completed 2026-05-30)
-- [ ] **Phase 4: Log Filtering** - Filter downloaded logs by keyword via sf log trace --keyword
+- [x] **Phase 4: Log Filtering** - Filter downloaded logs by keyword via sf log trace --keyword (completed 2026-05-31)
 
 ---
 
@@ -153,7 +153,7 @@ Plans:
   5. sf log trace --keyword --json output includes filterResult field with matched, rejected, keyword, sessionDir
   6. sf log filter --help still works (stub preserved for NUT compatibility)
 
-**Plans:** 3/4 plans executed
+**Plans:** 4/4 plans complete
 Plans:
 **Wave 1**
 
@@ -166,7 +166,7 @@ Plans:
 
 **Wave 3** *(blocked on Wave 2 completion)*
 
-- [ ] 04-03-PLAN.md — trace.ts keyword flag integration and filterDownloadedLogs wiring (Wave 3)
+- [x] 04-03-PLAN.md — trace.ts keyword flag integration and filterDownloadedLogs wiring (Wave 3)
 
 **UI hint**: yes
 
@@ -180,7 +180,7 @@ Plans:
 | 1. User Search | 1/1 | Complete | 2026-05-29 |
 | 2. Debug Sessions | 4/4 | Complete | 2026-05-30 |
 | 3. Log Management | 4/4 | Complete    | 2026-05-30 |
-| 4. Log Filtering | 3/4 | In Progress|  |
+| 4. Log Filtering | 4/4 | Complete   | 2026-05-31 |
 
 ---
 
