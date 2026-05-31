@@ -153,11 +153,11 @@ Plans:
   5. sf log trace --keyword --json output includes filterResult field with matched, rejected, keyword, sessionDir
   6. sf log filter --help still works (stub preserved for NUT compatibility)
 
-**Plans:** 4 plans
+**Plans:** 1/4 plans executed
 Plans:
 **Wave 1**
 
-- [ ] 04-01-PLAN.md — Test stubs: filter-helper.test.ts, keyword flag tests in trace.test.ts, updated filter.test.ts (Wave 1)
+- [x] 04-01-PLAN.md — Test stubs: filter-helper.test.ts, keyword flag tests in trace.test.ts, updated filter.test.ts (Wave 1)
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
@@ -180,7 +180,7 @@ Plans:
 | 1. User Search | 1/1 | Complete | 2026-05-29 |
 | 2. Debug Sessions | 4/4 | Complete | 2026-05-30 |
 | 3. Log Management | 4/4 | Complete    | 2026-05-30 |
-| 4. Log Filtering | 0/4 | Not started | — |
+| 4. Log Filtering | 1/4 | In Progress|  |
 
 ---
 
