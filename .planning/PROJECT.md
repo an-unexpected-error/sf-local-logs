@@ -1,5 +1,18 @@
 # Salesforce Debug Log CLI Plugin
 
+## Current Milestone: v1.1 Overlapping Trace Flag Handling
+
+**Goal:** Enable seamless trace flag creation when an existing trace already exists by automatically expiring the old trace and creating a new one.
+
+**Target features:**
+- Detect existing trace flags that conflict with new trace creation
+- Automatically expire overlapping trace flags (set EndTime to now)
+- Display existing trace flag details for debugging
+- Show user-friendly messages about actions taken
+- Support `--overwrite` flag to control behavior
+
+---
+
 ## What This Is
 
 A Salesforce SF CLI plugin that enables admins and engineers to efficiently manage and analyze debug logs from the command line. Instead of navigating the browser, users search for users by name, initiate debug sessions, download logs, and filter by keyword to pinpoint relevant debugging information. Designed for high-volume scenarios where storage limits and timestamp-only identification make analysis difficult.
