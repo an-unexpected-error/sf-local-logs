@@ -36,7 +36,12 @@
   4. Plugin handles multiple overlapping trace flags for the same user (3+ traces) without error
   5. Overlap detection query uses server-side SOQL datetime comparison (not client-side filtering)
 
-**Plans:** TBD
+**Plans:** 3 plans
+
+Plans:
+- [ ] 05-01-PLAN.md — Extend TraceResult type + add overlap message strings
+- [ ] 05-02-PLAN.md — Implement detectAndExpireOverlappingTraces() with unit tests
+- [ ] 05-03-PLAN.md — Wire detection into trace command + integration tests
 
 **UI hint**: no
 
@@ -133,7 +138,7 @@
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 5. Core Detection & Batch Expiration | 0/TBD | Not started | - |
+| 5. Core Detection & Batch Expiration | 0/3 | Planned | - |
 | 6. Command Integration & Display | 0/TBD | Not started | - |
 | 7. JSON Output Extension | 0/TBD | Not started | - |
 | 8. Behavior Control & Confirmations | 0/TBD | Not started | - |
