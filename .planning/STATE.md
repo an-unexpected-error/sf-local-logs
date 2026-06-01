@@ -226,9 +226,11 @@ The plugin enables this core workflow:
 | # | Description | Date | Commit | Directory |
 |---|-------------|------|--------|-----------|
 | 260531-u75 | Fix TraceFlag creation: Remove read-only StartTime field | 2026-05-31 | 76dd3b7 | [260531-u75-fix-traceflag-creation-error-1-no-such-c/](.planning/quick/260531-u75-fix-traceflag-creation-error-1-no-such-c/) |
+| 260601-tq5 | Fix error: LogType is required when creating trace flag | 2026-06-01 | 205e5be | [260601-tq5-fix-error-logtype-is-required-when-creat/](.planning/quick/260601-tq5-fix-error-logtype-is-required-when-creat/) |
 
 ## Decisions
 
 - [Phase ?]: Code review assertions used instead of live org tests: full E2E requires authenticated devhub + scratch org; structural assertions verify all implementation patterns without infrastructure
 - [Phase ?]: Always show user selection list even for single result: consistent UX across all search result counts (deferred to Phase 4)
 - [Quick 260531-u75]: TraceFlag StartTime field is read-only on Salesforce Tooling API; removed from create payload to fix "No such column 'StartTime'" error
+- [Quick 260601-tq5]: Salesforce Tooling API TraceFlag requires explicit LogType field; added 'DEVELOPER_LOG' to create payload to fix "LogType is required" error (2026-06-01)
