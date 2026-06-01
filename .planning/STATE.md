@@ -3,10 +3,10 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Overlapping Trace Flag Handling
 status: planning
-last_updated: "2026-06-01T11:48:44.330Z"
+last_updated: "2026-06-01T12:00:00.000Z"
 last_activity: 2026-06-01
 progress:
-  total_phases: 0
+  total_phases: 5
   completed_phases: 0
   total_plans: 0
   completed_plans: 0
@@ -15,9 +15,9 @@ progress:
 
 # Project State: Salesforce Debug Log CLI Plugin
 
-**Last Updated:** 2026-05-30  
-**Current Phase:** 04
-**Milestone:** v1 MVP
+**Last Updated:** 2026-06-01  
+**Current Milestone:** v1.1 Overlapping Trace Flag Handling  
+**Current Phase:** Planning  
 
 ---
 
@@ -25,41 +25,45 @@ progress:
 
 **Core Value:** Enable admins to efficiently locate and analyze debugging information in high-volume debug logs (1000s/minute) without leaving the CLI.
 
-**Project Mode:** MVP (Vertical Slices)
+**Project Mode:** Feature Addition (Progressive Enhancement of v1.0)
 
 **Granularity:** Standard (5 phases)
+
+**Version:** v1.1 Overlapping Trace Flag Handling
 
 ---
 
 ## Current Position
 
-Phase: Not started (defining requirements)
-Plan: —
-Status: Defining requirements
-Last activity: 2026-06-01 — Milestone v1.1 started
+**Milestone:** v1.1 Overlapping Trace Flag Handling  
+**Phase:** 5 (planning stage)  
+**Plan:** —  
+**Status:** Roadmap created, requirements mapped  
+**Last activity:** 2026-06-01 — Roadmap created for v1.1  
+
+**Progress:** 0/5 phases complete
 
 ## Performance Metrics
 
 | Metric | Target | Current | Status |
 |--------|--------|---------|--------|
-| v1 Requirements Mapped | 26 | 26 | ✓ Complete |
+| v1.1 Requirements Mapped | 12 | 12 | ✓ Complete |
 | Phase Coverage | 100% | 100% | ✓ Complete |
-| Average Plans per Phase | 5 | 5 | ✓ On track |
+| Phase Dependencies | Clear | Clear | ✓ Validated |
 
 ---
-| Phase 03 P04 | 11min | 3 tasks | 2 files |
 
 ## Roadmap Summary
 
-**Vertical MVP approach with 5 phases delivering end-to-end user capabilities:**
+**Feature addition: Automatic overlapping trace flag handling with 5 progressive phases:**
 
-1. **Phase 0:** Plugin framework and installation (3 requirements)
-2. **Phase 1:** User search by name with pagination (7 requirements including UX)
-3. **Phase 2:** Debug session initiation for tracing (7 requirements including UX)
-4. **Phase 3:** Log download, streaming, and purge functionality (15 requirements including UX)
-5. **Phase 4:** Log filtering, analysis, and export (6 requirements including UX)
+1. **Phase 5:** Core detection & batch expiration (detection logic, overlap algorithm, batch update API)
+2. **Phase 6:** Command integration & display (lifecycle reporting in standard output)
+3. **Phase 7:** JSON output extension (stopped trace details in programmatic output)
+4. **Phase 8:** Behavior control & confirmations (user confirmation prompts, --overwrite flag)
+5. **Phase 9:** Storage & safety (pre-trace quota check, graceful failure)
 
-Each phase enables independent user value and unblocks the next.
+Each phase adds one capability layer, with earlier phases blocking later ones.
 
 ---
 
@@ -67,142 +71,73 @@ Each phase enables independent user value and unblocks the next.
 
 | Decision | Rationale | Impact |
 |----------|-----------|--------|
-| Vertical MVP phases | Each phase delivers end-to-end capability; users can start using after Phase 1 | Fast to first value; clear blockers between phases |
-| Phase 0 as separate foundation | Plugin scaffolding, framework, and installation must precede all feature work | No features can start until framework is solid |
-| UX as cross-cutting requirement | Status messages, error handling, JSON output, and org flags apply throughout | All phases include UX work; integrated iteratively |
-| 1GB storage awareness from Phase 3 | Handle Salesforce's hard limit during download and purge operations | Storage management is built into core workflow, not retrofitted |
+| 5-phase structure for v1.1 | Clear dependencies: detection → display → JSON → control → safety | Sequential execution order enforced |
+| Batch expiration in Phase 5 | jsforce multi-record CRUD avoids N+1 queries | Better performance, especially for 3+ overlapping traces |
+| Confirmation before expiry (Phase 8) | Safety-first: user approval required before modifying existing traces | Prevents accidental cleanup; --overwrite override for scripting |
+| Pre-trace quota check (Phase 9) | Conservative approach: verify space before any cleanup logic | Avoid false optimism if quota check fails after expiry |
 
 ---
 
 ## Accumulated Context
 
-### Architecture Decisions
+### Architecture Decisions (v1.1)
 
-- **Plugin Type:** Salesforce CLI (sf) plugin with TypeScript implementation
-- **Installation:** Via `sf plugin install` from repository
-- **Compatibility:** Requires SF CLI v2.x+ and Node.js 18.0.0+
-- **Output Format:** Native Salesforce CLI patterns with `--json` support and `--target-org` awareness
+- **Detection:** SOQL query with datetime range overlap: `StartTime < newEnd AND ExpirationDate > newStart`
+- **Expiration:** jsforce `connection.tooling.update()` with array of {Id, ExpirationDate} records (automatic SObject Collection API routing)
+- **Overlap Algorithm:** Canonical set theory: `start1 < end2 AND start2 < end1` (native JavaScript Date, no new dependencies)
+- **Message Display:** Extend existing Salesforce CLI messages pattern (trace.json file updates)
+- **User Confirmation:** Interactive prompt via `Flags` pattern (reuse Phase 2 approach)
 
-### Technical Constraints
+### Technical Constraints (v1.1)
 
-- **Storage Limit:** Orgs have 1GB total debug log storage across all files
-- **Performance:** Must handle 1000s of logs/minute without degradation
-- **File Size:** Individual logs 10-100MB; streaming I/O required for memory efficiency
-- **High-Volume Scenario:** Core use case involves frequent log generation and cleanup
+- **No new dependencies:** jsforce + native Date sufficient; no date-fns, dayjs, or moment needed
+- **Backward compatibility:** Single-trace scenario (v1.0 common case) unaffected
+- **Timezone handling:** Salesforce timestamps always UTC; no conversion needed
+- **Batch limits:** Salesforce SObject Collection API batch limit 200/call; typical overlap is 1-5 traces (no recursion needed)
 
-### User Workflow
+### v1.1 Scope
 
-The plugin enables this core workflow:
+- Overlapping trace flag detection and automatic expiration
+- User confirmation before expiration (with override flag)
+- Display of stopped trace details and lifecycle
+- Storage quota check before creating new trace
+- JSON output extension for programmatic consumers
 
-1. Search for a user by name (find who to debug)
-2. Initiate a debug session for that user (start tracing)
-3. Download created logs (capture data)
-4. Filter logs by keyword (analyze quickly)
-5. Purge old logs when approaching storage limit (manage storage)
+### Out of v1.1
+
+- v2 features: trace renewal, bulk management, trace listing
+- Custom debug levels (v2)
+- Multi-org bulk operations (v2)
 
 ---
 
 ## Blockers & Open Questions
 
-**None at roadmap stage.** Ready to proceed to Phase 0 planning.
+**None at roadmap stage.** Ready to proceed to Phase 5 planning.
 
 ---
 
 ## Session Notes
 
-### Roadmap Phase (2026-05-29)
+### Roadmap Phase (2026-06-01)
 
-- Roadmap created using vertical MVP approach
-- All 26 v1 requirements successfully mapped (100% coverage)
-- UX requirements identified as cross-cutting (all phases)
-- Phase dependencies identified and documented
-
-### Phase 0 Discussion (2026-05-29)
-
-- Command namespace locked: `sf log`
-- Scaffold approach: All 5 commands now (empty placeholders)
-- Dev environment: Include test org setup and linking scripts
-- CI/CD: Configure GitHub Actions for lint/build/test
-- Decisions captured in 00-CONTEXT.md
-- Discussion log in 00-DISCUSSION-LOG.md
-
-### Phase 0 Planning (2026-05-29)
-
-- Research completed: Verified plugin-template-sf approach, Salesforce CLI patterns, oclif v4 best practices
-- 5 plans created (00-01 through 00-05):
-  - Plan 1 (Wave 1): Scaffold plugin + dependencies
-  - Plans 2-4 (Wave 2, parallel): Command stubs / Test infrastructure / CI/CD + dev setup
-  - Plan 5 (Wave 3): Integration verification + checkpoint
-- All 3 INSTALL requirements covered
-- Verification passed all 14 quality dimensions
-- Plans committed to git
-
-### Phase 1 Execution (2026-05-29)
-
-- Phase 0 and Phase 1 executed and verified
-- User search functionality implemented with fuzzy matching, interactive refinement, and pagination
-- All 7 Phase 1 requirements verified as complete
-
-### Phase 2 Discussion (2026-05-30)
-
-- 4 gray areas discussed: trace flag duration & renewal, default debug level, user selection flow, error handling & edge cases
-- Key decisions locked:
-  - Watch mode is the default behavior (monitors trace flag with progress bar)
-  - Use org's default DebugLevel, fail if unavailable
-  - Interactive search is the default UX (reuses Phase 1 search), with --user-id as scripting bypass
-  - Fail on existing trace flag, with --overwrite flag to replace
-- Context and discussion log committed to git
-- Ready for Phase 2 planning
-
-### Phase 2 Planning (2026-05-30)
-
-- Research completed: Salesforce Tooling API, jsforce patterns, cli-progress for watch mode, Phase 1 integration
-- 4 plans created across 4 waves:
-  - Wave 1: Foundation (package.json, TraceResult type, trace-helper utility)
-  - Wave 2: Core logic (trace command implementation, DebugLevel handling, error messages)
-  - Wave 3: Watch mode (monitoring loop, progress bar, SIGINT handling)
-  - Wave 4: Integration (interactive search, testing, human verification checkpoint)
-- All 7 phase requirements covered (DEBUG-01, DEBUG-02, DEBUG-03, UX-01, UX-02, UX-04, UX-05)
-- Plans verified and passed all checks
-- Ready for Phase 2 execution
-
-### Phase 3 Planning (2026-05-30)
-
-- Research completed: ApexLog API, storage quota, streaming I/O, SF CLI file storage conventions
-  - Critical blocker resolved: file storage location should use ~/.local/share/sf/plugin-logs/ (oclif standard)
-  - All technical patterns verified; no new package dependencies needed
-- 4 plans created in 4 waves:
-  - Wave 1: Foundation (5 tasks) — types, download-helper, storage-manager, quota-calculator
-  - Wave 2: Download integration (3 tasks) — extend trace command with streaming + quota checking
-  - Wave 3: Purge command + tests (8 tasks) — 175+ test cases (unit + integration)
-  - Wave 4: Verification gate (2 tasks + checkpoint) — NUT tests, human sign-off
-- All 13 Phase 3 requirements mapped to plans (DOWNLOAD-01–05, PURGE-01–03, UX-01–05)
-- Plan verification: 1 iteration (added read_first sections to all 18 tasks)
-- Plans committed to git; ready for execution
-
-### Phase 3 Discussion (2026-05-30)
-
-- 4 gray areas discussed: log discovery/download scope, storage quota checking, purge UX, local storage organization
-- Key decisions locked:
-  - Download is integrated into trace workflow (not a standalone command)
-  - Auto-download after trace creation, with parallel watch mode + download progress display
-  - Storage quota monitored during download; stop immediately if quota exceeded
-  - Purge deletes all org logs with confirmation showing freed space
-  - Local storage: ~/sf-logs/{user}/{YYYY-MM-DD-HH-MM}/ (pending FS location verification)
-  - Progress display: time elapsed, ETA, file count
-- Context and discussion log committed to git
-- Critical open item: file storage location conventions for SF CLI plugins (researcher blocker)
-- Ready for Phase 3 research and planning
+- v1.1 roadmap created: 5 phases, 12 requirements
+- All v1.1 requirements successfully mapped (100% coverage)
+- Phases derived from requirement dependencies, not arbitrary structure
+- Success criteria defined for each phase (2-5 observable behaviors)
+- Research synthesis completed: zero new dependencies, minimal code changes
+- Traceability table updated with phase mappings
+- Ready for Phase 5 planning
 
 ---
 
 ## Next Actions
 
-- [ ] Research Phase 3 implementation (ApexLog queries, storage quota API, SF CLI file storage conventions)
-- [ ] Plan Phase 3 implementation (extended trace command with download, purge command, local storage)
-- [ ] Execute Phase 3 plans after approval
-- [ ] Verify all 13 Phase 3 requirements (DOWNLOAD-01–05, PURGE-01–03, UX-01–05)
-- [ ] Track progress via `/gsd-progress`
+- [ ] Plan Phase 5: Core Detection & Batch Expiration
+- [ ] Implement Phase 5 (overlap detection logic + batch expiry)
+- [ ] Plan Phase 6: Command Integration & Display
+- [ ] Execute phases in order (5 → 6 → 7 → 8 → 9)
+- [ ] Verify v1.1 requirements completion
 
 ## Quick Tasks Completed
 
@@ -213,7 +148,7 @@ The plugin enables this core workflow:
 
 ## Decisions
 
-- [Phase ?]: Code review assertions used instead of live org tests: full E2E requires authenticated devhub + scratch org; structural assertions verify all implementation patterns without infrastructure
-- [Phase ?]: Always show user selection list even for single result: consistent UX across all search result counts (deferred to Phase 4)
-- [Quick 260531-u75]: TraceFlag StartTime field is read-only on Salesforce Tooling API; removed from create payload to fix "No such column 'StartTime'" error
-- [Quick 260601-tq5]: Salesforce Tooling API TraceFlag requires explicit LogType field; added 'DEVELOPER_LOG' to create payload to fix "LogType is required" error (2026-06-01)
+- [Phase 5-9]: Overlapping trace detection drives architecture; batch expiration + confirmation + quota check follow
+- [Phase 5-9]: No new dependencies needed; jsforce + native Date sufficient for all detection/expiration logic
+- [Phase 8]: Confirmation is default; --overwrite flag skips for scripting/automation
+- [Phase 9]: Quota check is conservative; refuse if any risk of exceeding limit
