@@ -5,7 +5,7 @@ import { Messages, Org } from '@salesforce/core';
 import { cli } from 'cli-ux';
 import { input } from '@inquirer/prompts';
 import cliProgress from 'cli-progress';
-import { getDefaultDebugLevel, createTraceFlag, checkExistingTraceFlag, getDebugLevelName, initiateDownloadAfterTrace, formatDownloadProgress } from '../../utils/trace-helper.js';
+import { getDefaultDebugLevel, createTraceFlag, detectAndExpireOverlappingTraces, getDebugLevelName, initiateDownloadAfterTrace, formatDownloadProgress } from '../../utils/trace-helper.js';
 import { watchTraceFlag } from '../../utils/trace-monitor.js';
 import { buildSearchQuery, escapeSoql } from '../../utils/soql-builder.js';
 import { formatRelativeDate } from '../../utils/date-formatter.js';
@@ -97,7 +97,6 @@ export default class Trace extends SfCommand<TraceWithDownloadResult> {
     let userId = flags['user-id'];
     const levelFlag = flags['level'];
     const noWatch = flags['no-watch'];
-    const overwrite = flags['overwrite'];
     const keyword = flags['keyword'];
 
     // If --user-id not provided, use interactive search
@@ -121,10 +120,13 @@ export default class Trace extends SfCommand<TraceWithDownloadResult> {
         }
       }
 
-      // Step 2: Check for existing active trace flag
-      await checkExistingTraceFlag(org, userId, overwrite);
-      if (overwrite) {
-        this.log(messages.getMessage('statusStoppingExistingTrace', [userId]));
+      // Step 2: Detect and expire overlapping (active, non-expired) trace flags
+      // Per D-04: check before create to avoid Salesforce DUPLICATE_VALUE error
+      // Per D-05: if this throws (batch update failure), error propagates to outer catch — do NOT create trace
+      const stoppedTraces = await detectAndExpireOverlappingTraces(org, userId);
+      if (stoppedTraces.length > 0) {
+        this.log(messages.getMessage('statusDetectedOverlappingTraces', [stoppedTraces.length]));
+        this.log(messages.getMessage('statusStoppingOverlappingTraces', [stoppedTraces.length]));
       }
 
       // Step 3: Create new TraceFlag
@@ -183,6 +185,7 @@ export default class Trace extends SfCommand<TraceWithDownloadResult> {
           debugLevel: debugLevelName,
           expirationDate: traceFlagResult.expirationDate,
         },
+        stoppedTraces,
       };
 
       // Step 8: Initiate download after trace creation (D-01, D-02)
