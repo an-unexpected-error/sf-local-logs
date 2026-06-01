@@ -2,9 +2,10 @@
 gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Overlapping Trace Flag Handling
-status: planning
-last_updated: "2026-06-01T12:00:00.000Z"
-last_activity: 2026-06-01
+current_phase: Planning
+status: Roadmap created, requirements mapped
+last_updated: "2026-06-01T12:37:55.323Z"
+last_activity: 2026-06-01 — Roadmap created for v1.1
 progress:
   total_phases: 5
   completed_phases: 0
