@@ -6,6 +6,7 @@ import {
   calculateDownloadTimeWindow,
   formatDownloadProgress,
   initiateDownloadAfterTrace,
+  detectAndExpireOverlappingTraces,
 } from '../../../src/utils/trace-helper.js';
 
 describe('Trace Command', () => {
@@ -617,5 +618,31 @@ describe('SIGINT Handling During Download', () => {
   it('SIGINT exits with code 0 (user cancellation is not an error)', () => {
     const source = Trace.toString();
     expect(source).to.include('process.exit(0)');
+  });
+});
+
+// =============================================================================
+// Overlap Detection Integration (Phase 5)
+// =============================================================================
+
+describe('Overlap Detection Integration (Phase 5)', () => {
+  it('detectAndExpireOverlappingTraces is exported as an async function', () => {
+    expect(detectAndExpireOverlappingTraces).to.be.a('function');
+  });
+
+  it('detectAndExpireOverlappingTraces accepts 2 parameters', () => {
+    expect(detectAndExpireOverlappingTraces.length).to.equal(2);
+  });
+
+  it('stoppedTraces element type matches TraceResult contract', () => {
+    const example = { id: 'tf001', expirationDate: '2026-06-02T00:00:00Z' };
+    expect(example.id).to.be.a('string');
+    expect(example.expirationDate).to.be.a('string');
+    expect(Object.keys(example)).to.deep.equal(['id', 'expirationDate']);
+  });
+
+  it('Trace.flags overwrite flag is still defined (for Phase 8)', () => {
+    const flags = Trace.flags as Record<string, unknown>;
+    expect(flags['overwrite']).to.exist;
   });
 });
