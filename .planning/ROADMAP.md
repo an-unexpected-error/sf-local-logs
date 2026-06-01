@@ -10,7 +10,7 @@
 
 ## Phases
 
-- [ ] **Phase 5: Core Detection & Batch Expiration** - Detect overlapping trace flags and expire them in a single batch operation
+- [x] **Phase 5: Core Detection & Batch Expiration** - Detect overlapping trace flags and expire them in a single batch operation (completed 2026-06-01)
 - [ ] **Phase 6: Command Integration & Display** - Wire overlap detection into trace command and display lifecycle information
 - [ ] **Phase 7: JSON Output Extension** - Include stopped trace flag details in --json output
 - [ ] **Phase 8: Behavior Control & Confirmations** - Add user confirmation flow and --overwrite flag
@@ -36,12 +36,12 @@
   4. Plugin handles multiple overlapping trace flags for the same user (3+ traces) without error
   5. Overlap detection query uses server-side SOQL datetime comparison (not client-side filtering)
 
-**Plans:** 1/3 plans executed
+**Plans:** 3/3 plans complete
 
 Plans:
 - [x] 05-01-PLAN.md — Extend TraceResult type + add overlap message strings
-- [ ] 05-02-PLAN.md — Implement detectAndExpireOverlappingTraces() with unit tests
-- [ ] 05-03-PLAN.md — Wire detection into trace command + integration tests
+- [x] 05-02-PLAN.md — Implement detectAndExpireOverlappingTraces() with unit tests
+- [x] 05-03-PLAN.md — Wire detection into trace command + integration tests
 
 **UI hint**: no
 
@@ -138,7 +138,7 @@ Plans:
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 5. Core Detection & Batch Expiration | 1/3 | In Progress|  |
+| 5. Core Detection & Batch Expiration | 3/3 | Complete   | 2026-06-01 |
 | 6. Command Integration & Display | 0/TBD | Not started | - |
 | 7. JSON Output Extension | 0/TBD | Not started | - |
 | 8. Behavior Control & Confirmations | 0/TBD | Not started | - |
