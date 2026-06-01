@@ -139,3 +139,12 @@ No logs downloaded — skipping keyword filter.
 
 # filterError
 Keyword filtering failed: %s. All logs remain in %s
+
+# statusDetectedOverlappingTraces
+Detected %d overlapping trace(s) for user. Stopping them before creating new trace...
+
+# statusStoppingOverlappingTraces
+Stopped %d overlapping trace(s). Creating new trace...
+
+# statusStoppedTrace
+Stopped trace %s (was expiring %s)
