@@ -51,6 +51,37 @@
 - [ ] **INSTALL-02**: Plugin works with Salesforce CLI (sf) v2.x+
 - [ ] **INSTALL-03**: Plugin requires Node.js 18.0.0 or later
 
+## v1.1 Requirements
+
+Requirements for overlapping trace flag handling milestone.
+
+### Detection & Display
+
+- [ ] **TRACE-01**: Plugin detects when a trace flag already exists for the target user
+- [ ] **TRACE-02**: Plugin displays existing trace flag details (created date, expiration date)
+
+### Expiration & Confirmation
+
+- [ ] **TRACE-03**: Plugin automatically expires the existing trace flag (sets EndTime to now)
+- [ ] **TRACE-04**: Plugin requests user confirmation before expiring an existing trace
+- [ ] **TRACE-05**: Plugin reports which trace flag was stopped and when new trace started
+
+### Storage & Safety
+
+- [ ] **TRACE-06**: Plugin checks org storage quota before creating new trace
+- [ ] **TRACE-07**: Plugin fails gracefully if org storage exceeds quota threshold
+- [ ] **TRACE-08**: Plugin handles multiple overlapping trace flags for same user
+
+### Output & UX
+
+- [ ] **TRACE-09**: Plugin displays trace flag lifecycle in standard output (created, stopped, new created)
+- [ ] **TRACE-10**: Plugin includes stopped trace flag details in --json output
+
+### Behavior Control
+
+- [ ] **TRACE-11**: `--overwrite` or `--force` flag skips confirmation for overlapping traces
+- [ ] **TRACE-12**: Help text documents behavior for existing trace flags
+
 ## v2 Requirements
 
 Deferred to future release. Not in current roadmap.
@@ -124,13 +155,25 @@ Which phases cover which requirements. Updated during roadmap creation.
 | INSTALL-01 | Phase 0 | Pending |
 | INSTALL-02 | Phase 0 | Pending |
 | INSTALL-03 | Phase 0 | Pending |
+| TRACE-01 | Phase 5 | Pending |
+| TRACE-02 | Phase 5 | Pending |
+| TRACE-03 | Phase 5 | Pending |
+| TRACE-04 | Phase 5 | Pending |
+| TRACE-05 | Phase 5 | Pending |
+| TRACE-06 | Phase 5 | Pending |
+| TRACE-07 | Phase 5 | Pending |
+| TRACE-08 | Phase 5 | Pending |
+| TRACE-09 | Phase 5 | Pending |
+| TRACE-10 | Phase 5 | Pending |
+| TRACE-11 | Phase 5 | Pending |
+| TRACE-12 | Phase 5 | Pending |
 
 **Coverage:**
 
-- v1 requirements: 26 total
-- Mapped to phases: 26
+- v1.1 requirements: 12 total
+- Mapped to phases: 12
 - Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-05-29*
-*Last updated: 2026-05-29 after roadmap creation*
+*Last updated: 2026-06-01 after v1.1 research synthesis*
