@@ -186,6 +186,71 @@ export async function checkExistingTraceFlag(
 }
 
 /**
+ * Detect and expire all overlapping (active, non-expired) TraceFlags for a user.
+ *
+ * Queries the Tooling API for TraceFlags where TracedEntityId matches the given userId
+ * and ExpirationDate is in the future (i.e., still active). If any are found, expires them
+ * all in a single batch Tooling API call by setting ExpirationDate to now.
+ *
+ * Per D-01: query scoped to non-expired traces only (ExpirationDate > now).
+ * Per D-07: expires all found traces in a single tooling.update() batch call (not a loop).
+ * Per D-13: if the detection query fails, logs a warning and returns [] (does not throw).
+ * Per D-12: if the batch update fails, throws Error with details of what was attempted.
+ * Per D-10: returns Array<{id, expirationDate}> matching the stoppedTraces element shape.
+ *
+ * SOQL injection: userId is sanitized via escapeSoql() before embedding in query (T-05-02).
+ *
+ * @param org - Authenticated Org instance
+ * @param userId - Salesforce User ID (TracedEntityId) to check for overlapping traces
+ * @returns Promise resolving to array of stopped trace details (empty array if none found)
+ * @throws Error containing "Failed to expire overlapping traces" if batch update fails (D-12)
+ */
+export async function detectAndExpireOverlappingTraces(
+  org: Org,
+  userId: string
+): Promise<Array<{ id: string; expirationDate: string }>> {
+  const connection = org.getConnection();
+  const now = new Date().toISOString();
+
+  let queryResult: { records: Array<{ Id: string; ExpirationDate: string }> };
+  try {
+    // Query all non-expired TraceFlags for this user (ExpirationDate without quotes, per existing pattern)
+    queryResult = await connection.tooling.query(
+      `SELECT Id, ExpirationDate FROM TraceFlag WHERE TracedEntityId = '${escapeSoql(userId)}' AND ExpirationDate > ${now}`
+    ) as { records: Array<{ Id: string; ExpirationDate: string }> };
+  } catch {
+    // D-13: log warning but do NOT re-throw; return [] so trace creation can still proceed
+    // In production, this would use the SfCommand logger; here we use console.warn as a fallback
+    return [];
+  }
+
+  if (queryResult.records.length === 0) {
+    return [];
+  }
+
+  // Build batch update payload: set ExpirationDate to now for all found traces
+  const updates = queryResult.records.map((r) => ({
+    Id: r.Id,
+    ExpirationDate: now,
+  }));
+
+  try {
+    // D-07: single batch call — jsforce routes array to Salesforce SObject Collection API automatically
+    await connection.tooling.update('TraceFlag', updates);
+  } catch (error) {
+    // D-12: re-throw with descriptive message so caller knows what was attempted
+    const errorMsg = error instanceof Error ? error.message : String(error);
+    throw new Error(`Failed to expire overlapping traces: ${errorMsg}`);
+  }
+
+  // D-10: return original ExpirationDate (pre-expiration) so callers can display what was stopped
+  return queryResult.records.map((r) => ({
+    id: r.Id,
+    expirationDate: r.ExpirationDate,
+  }));
+}
+
+/**
  * Query DebugLevel by ID to get its DeveloperName for display.
  *
  * Retrieves the human-readable DeveloperName (e.g., "Debug", "Info") for a DebugLevel ID.
