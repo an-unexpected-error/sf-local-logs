@@ -97,6 +97,7 @@ export async function createTraceFlag(
     const result = await connection.tooling.create('TraceFlag', {
       TracedEntityId: userId,
       DebugLevelId: debugLevelId,
+      LogType: 'DEVELOPER_LOG',
       ExpirationDate: expirationDate.toISOString(),
     }) as { id?: string; success?: boolean; errors?: Array<{ message: string }> };
 
